@@ -1,0 +1,1079 @@
+warning: unused imports: `Duration`, `UNIX_EPOCH`
+  --> src/manifoldchain/block/consensus_block.rs:16:29
+   |
+16 | use std::time::{SystemTime, UNIX_EPOCH, Duration};
+   |                             ^^^^^^^^^^  ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused imports: `CrossUtxoStatus`, `ExclusiveFullBlock`, `InclusiveFullBlock`, `inclusive_block::InclusiveBlock`, `transaction_block::TransactionBlock`
+  --> src/manifoldchain/blockchain/mod.rs:10:13
+   |
+10 |             inclusive_block::InclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+11 |             transaction_block::TransactionBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+14 |                 ExclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+15 |                 InclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+...
+29 |             CrossUtxoStatus,
+   |             ^^^^^^^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/manifoldchain/blockchain/mod.rs:41:11
+   |
+41 | use log::{debug, info};
+   |           ^^^^^
+
+warning: unused import: `debug`
+ --> src/manifoldchain/miner/worker.rs:2:11
+  |
+2 | use log::{debug, info};
+  |           ^^^^^
+
+warning: unused import: `Sample`
+  --> src/manifoldchain/miner/worker.rs:17:35
+   |
+17 |             worker::{SampleIndex, Sample},
+   |                                   ^^^^^^
+
+warning: unnecessary parentheses around `match` scrutinee expression
+   --> src/manifoldchain/miner/worker.rs:182:56
+    |
+182 | ...                   let inserted_block = match (shard_id == self.config.shard_id) {
+    |                                                  ^                                ^
+    |
+    = note: `#[warn(unused_parens)]` on by default
+help: remove these parentheses
+    |
+182 -                             let inserted_block = match (shard_id == self.config.shard_id) {
+182 +                             let inserted_block = match shard_id == self.config.shard_id {
+    |
+
+warning: unused import: `SystemTime`
+  --> src/manifoldchain/miner/mod.rs:11:18
+   |
+11 |     time::{self, SystemTime}, 
+   |                  ^^^^^^^^^^
+
+warning: unused imports: `BlockHeader`, `TestimonyUnit`, `merkle::MerkleTree`
+  --> src/manifoldchain/miner/mod.rs:18:9
+   |
+18 |         merkle::MerkleTree, 
+   |         ^^^^^^^^^^^^^^^^^^
+...
+25 |             BlockHeader,
+   |             ^^^^^^^^^^^
+...
+45 |             TestimonyUnit,
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Block`, `VersaBlock`, `VersaHash`
+  --> src/manifoldchain/network/message.rs:9:13
+   |
+9  |             Block,
+   |             ^^^^^
+...
+13 |                 VersaBlock,
+   |                 ^^^^^^^^^^
+14 |                 VersaHash,
+   |                 ^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/manifoldchain/network/server.rs:25:24
+   |
+25 | use log::{info, trace, debug};
+   |                        ^^^^^
+
+warning: unused import: `SystemTime`
+  --> src/manifoldchain/network/worker.rs:34:18
+   |
+34 |     time::{self, SystemTime},
+   |                  ^^^^^^^^^^
+
+warning: unused imports: `UtxoInput`, `UtxoOutput`
+  --> src/manifoldchain/transaction/generator.rs:14:13
+   |
+14 |             UtxoInput,
+   |             ^^^^^^^^^
+15 |             UtxoOutput,
+   |             ^^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/manifoldchain/transaction/generator.rs:38:17
+   |
+38 | use log::{info, debug};
+   |                 ^^^^^
+
+warning: unused import: `KeyPair`
+  --> src/manifoldchain/transaction/generator.rs:39:39
+   |
+39 | use ring::signature::{Ed25519KeyPair, KeyPair};
+   |                                       ^^^^^^^
+
+warning: unused imports: `ExclusiveFullBlock`, `InclusiveFullBlock`, `exclusive_block::ExclusiveBlock`, `inclusive_block::InclusiveBlock`
+  --> src/manifoldchain/validator/mod.rs:12:13
+   |
+12 |             exclusive_block::ExclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+13 |             inclusive_block::InclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+16 |                 ExclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+17 |                 InclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/manifoldchain/validator/mod.rs:49:17
+   |
+49 | use log::{info, debug};
+   |                 ^^^^^
+
+warning: unused imports: `ExclusiveFullBlock`, `InclusiveFullBlock`, `exclusive_block::ExclusiveBlock`, `inclusive_block::InclusiveBlock`
+  --> src/manifoldchain/testimony/mod.rs:10:17
+   |
+10 |                 ExclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+11 |                 InclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+12 |             },
+13 |             exclusive_block::ExclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14 |             inclusive_block::InclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `configuration::Configuration`
+  --> src/manifoldchain/mempool/mod.rs:12:9
+   |
+12 |         configuration::Configuration,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `debug`, `info`
+  --> src/manifoldchain/mempool/mod.rs:16:11
+   |
+16 | use log::{info, debug};
+   |           ^^^^  ^^^^^
+
+warning: unused import: `Info`
+  --> src/manifoldchain/multichain/mod.rs:10:13
+   |
+10 |             Info,
+   |             ^^^^
+
+warning: unused imports: `debug`, `info`
+ --> src/manifoldchain/confirmation/mod.rs:3:11
+  |
+3 | use log::{info, debug};
+  |           ^^^^  ^^^^^
+
+warning: unused imports: `Arc`, `Mutex`, `SystemTime`, `self`, `thread`
+ --> src/manifoldchain/confirmation/mod.rs:5:12
+  |
+5 |     time::{self, SystemTime}, 
+  |            ^^^^  ^^^^^^^^^^
+6 |     thread, 
+  |     ^^^^^^
+7 |     sync::{Arc, Mutex},
+  |            ^^^  ^^^^^
+
+warning: unused imports: `BlockHeader`, `ExclusiveFullBlock`, `InclusiveFullBlock`, `consensus_block::ConsensusBlock`, `exclusive_block::ExclusiveBlock`, `inclusive_block::InclusiveBlock`, `mempool::Mempool`, `merkle::MerkleTree`, `message::Message`, `server::Handle as ServerHandle`, `transaction_block::TransactionBlock`
+  --> src/manifoldchain/confirmation/mod.rs:12:9
+   |
+12 |         merkle::MerkleTree, 
+   |         ^^^^^^^^^^^^^^^^^^
+...
+19 |             BlockHeader,
+   |             ^^^^^^^^^^^
+20 |             consensus_block::ConsensusBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 |             exclusive_block::ExclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+22 |             inclusive_block::InclusiveBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+23 |             transaction_block::TransactionBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+26 |                 ExclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+27 |                 InclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+...
+36 |         mempool::Mempool,
+   |         ^^^^^^^^^^^^^^^^
+...
+42 |             server::Handle as ServerHandle,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+43 |             message::Message,
+   |             ^^^^^^^^^^^^^^^^
+
+warning: unused import: `rand::Rng`
+  --> src/manifoldchain/confirmation/mod.rs:47:5
+   |
+47 | use rand::Rng;
+   |     ^^^^^^^^^
+
+warning: unused imports: `ExclusiveFullBlock`, `InclusiveFullBlock`, `Testimony`, `Transaction`, `VersaBlock`
+  --> src/manifoldchain/database/mod.rs:5:17
+   |
+5  |                 ExclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+6  |                 InclusiveFullBlock,
+   |                 ^^^^^^^^^^^^^^^^^^
+7  |                 VersaBlock,
+   |                 ^^^^^^^^^^
+...
+11 |             Transaction,
+   |             ^^^^^^^^^^^
+...
+14 |             Testimony,
+   |             ^^^^^^^^^
+
+warning: unused imports: `DBIterator`, `Direction`
+  --> src/manifoldchain/database/mod.rs:24:28
+   |
+24 | use rocksdb::{DB, Options, DBIterator, Direction, IteratorMode};
+   |                            ^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Deserialize`
+  --> src/manifoldchain/database/mod.rs:25:24
+   |
+25 | use serde::{Serialize, Deserialize, de::DeserializeOwned};
+   |                        ^^^^^^^^^^^
+
+warning: unused import: `debug`
+ --> src/manifoldchain/verifier/mod.rs:1:17
+  |
+1 | use log::{info, debug};
+  |                 ^^^^^
+
+warning: unused imports: `Receiver`, `Sender`, `TryRecvError`, `unbounded`
+ --> src/manifoldchain/verifier/mod.rs:3:5
+  |
+3 |     unbounded, 
+  |     ^^^^^^^^^
+4 |     Receiver, 
+  |     ^^^^^^^^
+5 |     Sender, 
+  |     ^^^^^^
+6 |     TryRecvError
+  |     ^^^^^^^^^^^^
+
+warning: unused imports: `Arc`, `Mutex`, `SystemTime`, `collections::HashMap`
+  --> src/manifoldchain/verifier/mod.rs:9:18
+   |
+9  |     time::{self, SystemTime}, 
+   |                  ^^^^^^^^^^
+10 |     thread, 
+11 |     sync::{Arc, Mutex},
+   |            ^^^  ^^^^^
+12 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Receiver`, `Sender`, `TryRecvError`, `unbounded`
+  --> src/manifoldchain/mod.rs:46:5
+   |
+46 |     unbounded,
+   |     ^^^^^^^^^
+47 |     Receiver,
+   |     ^^^^^^^^
+48 |     Sender,
+   |     ^^^^^^
+49 |     TryRecvError,
+   |     ^^^^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/manifoldchain/mod.rs:53:24
+   |
+53 | use log::{error, info, debug};
+   |                        ^^^^^
+
+warning: unused imports: `H256`, `Hashable`
+  --> src/optchain/api/mod.rs:18:13
+   |
+18 |             H256,
+   |             ^^^^
+19 |             Hashable,
+   |             ^^^^^^^^
+
+warning: unused macro definition: `respond_json`
+  --> src/optchain/api/mod.rs:64:14
+   |
+64 | macro_rules! respond_json {
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_macros)]` on by default
+
+warning: unused imports: `BlockContent`, `merkle::MerkleTree`, `transaction::Transaction`
+  --> src/optchain/block/transaction_block.rs:4:9
+   |
+4  |         merkle::MerkleTree,
+   |         ^^^^^^^^^^^^^^^^^^
+...
+9  |             BlockContent,
+   |             ^^^^^^^^^^^^
+...
+12 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> src/optchain/block/transaction_block.rs:16:5
+   |
+16 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration`, `UNIX_EPOCH`
+  --> src/optchain/block/transaction_block.rs:17:29
+   |
+17 | use std::time::{SystemTime, UNIX_EPOCH, Duration};
+   |                             ^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `Content`, `network::worker::Sample`, `transaction::Transaction`, `transaction_block::TransactionBlock`
+  --> src/optchain/block/versa_block.rs:5:13
+   |
+5  |             Content,
+   |             ^^^^^^^
+...
+8  |             transaction_block::TransactionBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+9  |         },
+10 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+11 |         network::worker::Sample,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `collections::HashMap`
+  --> src/optchain/block/versa_block.rs:17:5
+   |
+17 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `transaction::Transaction`
+  --> src/optchain/block/proposer_block.rs:12:9
+   |
+12 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration`, `UNIX_EPOCH`
+  --> src/optchain/block/proposer_block.rs:16:29
+   |
+16 | use std::time::{SystemTime, UNIX_EPOCH, Duration};
+   |                             ^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `transaction::Transaction`
+  --> src/optchain/block/availability_block.rs:12:9
+   |
+12 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration`, `UNIX_EPOCH`
+  --> src/optchain/block/availability_block.rs:16:29
+   |
+16 | use std::time::{SystemTime, UNIX_EPOCH, Duration};
+   |                             ^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `Content`, `CrossUtxoStatus`, `Transaction`, `TxFlag`, `Validator`, `availability_block::AvailabilityBlock`, `proposer_block::ProposerBlock`
+  --> src/optchain/blockchain/mod.rs:8:13
+   |
+8  |             Content,
+   |             ^^^^^^^
+9  |             transaction_block::TransactionBlock,
+10 |             proposer_block::ProposerBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+11 |             availability_block::AvailabilityBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+15 |             Transaction,
+   |             ^^^^^^^^^^^
+16 |             TxFlag,
+   |             ^^^^^^
+...
+20 |             Validator,
+   |             ^^^^^^^^^
+21 |             CrossUtxoStatus,
+   |             ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Error`, `Write`, `fs::File`
+  --> src/optchain/blockchain/mod.rs:29:5
+   |
+29 |     fs::File,
+   |     ^^^^^^^^
+30 |     io::{Write, Error},
+   |          ^^^^^  ^^^^^
+
+warning: unused import: `debug`
+  --> src/optchain/blockchain/mod.rs:32:11
+   |
+32 | use log::{debug};
+   |           ^^^^^
+
+warning: unused imports: `DateTime`, `Local`
+  --> src/optchain/blockchain/mod.rs:33:14
+   |
+33 | use chrono::{DateTime, Local};
+   |              ^^^^^^^^  ^^^^^
+
+warning: unused imports: `Duration`, `UNIX_EPOCH`
+  --> src/optchain/blockchain/mod.rs:34:29
+   |
+34 | use std::time::{SystemTime, UNIX_EPOCH, Duration};
+   |                             ^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `availability_block::AvailabilityBlock`, `proposer_block::ProposerBlock`, `transaction::Transaction`, `transaction_block::TransactionBlock`
+  --> src/optchain/miner/worker.rs:8:13
+   |
+8  |             transaction_block::TransactionBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+9  |             proposer_block::ProposerBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 |             availability_block::AvailabilityBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+22 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `collections::HashMap`
+  --> src/optchain/miner/worker.rs:35:5
+   |
+35 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `debug`
+ --> src/optchain/miner/mod.rs:3:17
+  |
+3 | use log::{info, debug};
+  |                 ^^^^^
+
+warning: unused imports: `SystemTime`, `collections::HashMap`
+  --> src/optchain/miner/mod.rs:11:18
+   |
+11 |     time::{self, SystemTime}, 
+   |                  ^^^^^^^^^^
+...
+14 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `BlockHeader`, `Info`, `TxFlag`, `merkle::MerkleTree`
+  --> src/optchain/miner/mod.rs:18:9
+   |
+18 |         merkle::MerkleTree, 
+   |         ^^^^^^^^^^^^^^^^^^
+...
+23 |             Info,
+   |             ^^^^
+...
+26 |             BlockHeader,
+   |             ^^^^^^^^^^^
+...
+34 |         transaction::{Transaction, TxFlag},
+   |                                    ^^^^^^
+
+warning: unused imports: `Block`, `availability_block::AvailabilityBlock`, `proposer_block::ProposerBlock`, `transaction::Transaction`
+  --> src/optchain/network/message.rs:9:13
+   |
+9  |             Block,
+   |             ^^^^^
+10 |             proposer_block::ProposerBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+11 |             availability_block::AvailabilityBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+18 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/optchain/network/server.rs:20:24
+   |
+20 | use log::{info, trace, debug};
+   |                        ^^^^^
+
+warning: unused imports: `Transaction`, `ValidationSource`, `availability_block::AvailabilityBlock`, `proposer_block::ProposerBlock`
+  --> src/optchain/network/worker.rs:11:23
+   |
+11 |         transaction::{Transaction},
+   |                       ^^^^^^^^^^^
+...
+14 |             proposer_block::ProposerBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+15 |             availability_block::AvailabilityBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+23 |         validator::{Validator, ValidationSource},
+   |                                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `SystemTime`, `self`
+  --> src/optchain/network/worker.rs:35:12
+   |
+35 |     time::{self, SystemTime},
+   |            ^^^^  ^^^^^^^^^^
+
+warning: unused import: `rand::Rng`
+  --> src/optchain/network/worker.rs:40:5
+   |
+40 | use rand::Rng;
+   |     ^^^^^^^^^
+
+warning: unnecessary parentheses around pattern
+   --> src/optchain/network/worker.rs:187:25
+    |
+187 |                     let (response_1) = self
+    |                         ^          ^
+    |
+help: remove these parentheses
+    |
+187 -                     let (response_1) = self
+187 +                     let response_1 = self
+    |
+
+warning: unused imports: `H256`, `Info`, `SymbolIndex`, `Symbol`, `Transaction`, `TxFlag`, `UtxoInput`, `availability_block::AvailabilityBlock`, `merkle::MerkleTree`, `proposer_block::ProposerBlock`, `transaction_block::TransactionBlock`
+  --> src/optchain/validator/mod.rs:4:23
+   |
+4  |         transaction::{Transaction, UtxoInput, TxFlag},
+   |                       ^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^
+5  |         block::{
+6  |             Info, 
+   |             ^^^^
+7  |             Content, 
+8  |             proposer_block::ProposerBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+9  |             availability_block::AvailabilityBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 |             transaction_block::TransactionBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+16 |             SymbolIndex,
+   |             ^^^^^^^^^^^
+17 |             Symbol,
+   |             ^^^^^^
+...
+21 |         hash::{Hashable, H256},
+   |                          ^^^^
+22 |         merkle::MerkleTree,
+   |         ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `collections::HashMap`
+  --> src/optchain/validator/mod.rs:27:5
+   |
+27 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `debug`, `info`
+  --> src/optchain/validator/mod.rs:29:11
+   |
+29 | use log::{info, debug};
+   |           ^^^^  ^^^^^
+
+warning: unused import: `HashMap`
+  --> src/optchain/mempool/mod.rs:10:34
+   |
+10 | use std::collections::{VecDeque, HashMap};
+   |                                  ^^^^^^^
+
+warning: unused imports: `debug`, `info`
+  --> src/optchain/mempool/mod.rs:11:11
+   |
+11 | use log::{info, debug};
+   |           ^^^^  ^^^^^
+
+warning: unused imports: `Duration`, `UNIX_EPOCH`
+  --> src/optchain/mempool/mod.rs:12:29
+   |
+12 | use std::time::{SystemTime, UNIX_EPOCH, Duration};
+   |                             ^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `transaction::Transaction`
+  --> src/optchain/multichain/mod.rs:12:9
+   |
+12 |         transaction::Transaction,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `collections::HashMap`
+  --> src/optchain/multichain/mod.rs:20:5
+   |
+20 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DBIterator`, `Direction`
+ --> src/optchain/database/mod.rs:9:28
+  |
+9 | use rocksdb::{DB, Options, DBIterator, Direction, IteratorMode};
+  |                            ^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Deserialize`
+  --> src/optchain/database/mod.rs:10:24
+   |
+10 | use serde::{Serialize, Deserialize, de::DeserializeOwned};
+   |                        ^^^^^^^^^^^
+
+warning: unused import: `debug`
+ --> src/optchain/symbolpool/verifier.rs:1:17
+  |
+1 | use log::{info, debug};
+  |                 ^^^^^
+
+warning: unused imports: `Receiver`, `Sender`, `TryRecvError`, `unbounded`
+ --> src/optchain/symbolpool/verifier.rs:3:5
+  |
+3 |     unbounded, 
+  |     ^^^^^^^^^
+4 |     Receiver, 
+  |     ^^^^^^^^
+5 |     Sender, 
+  |     ^^^^^^
+6 |     TryRecvError
+  |     ^^^^^^^^^^^^
+
+warning: unused imports: `SystemTime`, `collections::HashMap`
+  --> src/optchain/symbolpool/verifier.rs:9:18
+   |
+9  |     time::{self, SystemTime}, 
+   |                  ^^^^^^^^^^
+...
+12 |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Content`, `H256`, `Hashable`, `SampleIndex`, `Symbol`, `availability_block::AvailabilityBlock`, `proposer_block::ProposerBlock`, `transaction_block::TransactionBlock`, `versa_block::VersaBlock`
+  --> src/optchain/symbolpool/verifier.rs:21:22
+   |
+21 |             worker::{SampleIndex},
+   |                      ^^^^^^^^^^^
+...
+25 |             Symbol,
+   |             ^^^^^^
+...
+30 |             Content,
+   |             ^^^^^^^
+31 |             transaction_block::TransactionBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+32 |             proposer_block::ProposerBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+33 |             availability_block::AvailabilityBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+34 |             versa_block::VersaBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+...
+37 |     types::hash::{H256, Hashable},
+   |                   ^^^^  ^^^^^^^^
+
+warning: unused import: `rand::Rng`
+  --> src/optchain/symbolpool/verifier.rs:39:5
+   |
+39 | use rand::Rng;
+   |     ^^^^^^^^^
+
+warning: unused imports: `Arc`, `Mutex`, `self`, `thread`
+ --> src/optchain/symbolpool/mod.rs:4:12
+  |
+4 |     time::{self, SystemTime},
+  |            ^^^^
+5 |     thread,
+  |     ^^^^^^
+6 |     sync::{Arc,Mutex},
+  |            ^^^ ^^^^^
+
+warning: unused import: `Rng`
+  --> src/optchain/symbolpool/mod.rs:13:5
+   |
+13 |     Rng,
+   |     ^^^
+
+warning: unused import: `worker::Worker as MinerWorker`
+  --> src/optchain/mod.rs:28:13
+   |
+28 |             worker::Worker as MinerWorker,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Receiver`, `Sender`, `TryRecvError`, `unbounded`
+  --> src/optchain/mod.rs:43:5
+   |
+43 |     unbounded,
+   |     ^^^^^^^^^
+44 |     Receiver,
+   |     ^^^^^^^^
+45 |     Sender,
+   |     ^^^^^^
+46 |     TryRecvError,
+   |     ^^^^^^^^^^^^
+
+warning: unused import: `debug`
+  --> src/optchain/mod.rs:50:24
+   |
+50 | use log::{error, info, debug};
+   |                        ^^^^^
+
+warning: unused import: `Rng`
+ --> src/tests/unit_tests/transaction_test.rs:1:18
+  |
+1 | use rand::{self, Rng};
+  |                  ^^^
+  |
+help: consider adding a `#[cfg(test)]` to the containing module
+ --> src/tests/unit_tests/mod.rs:2:1
+  |
+2 | pub mod transaction_test;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `H256`, `Hashable`, `key_pair`, `transaction::*`
+ --> src/tests/unit_tests/transaction_test.rs:4:9
+  |
+4 |         transaction::*,
+  |         ^^^^^^^^^^^^^^
+...
+7 |         key_pair,
+  |         ^^^^^^^^
+8 |         hash::{Hashable, H256},
+  |                ^^^^^^^^  ^^^^
+  |
+help: consider adding a `#[cfg(test)]` to the containing module
+ --> src/tests/unit_tests/mod.rs:2:1
+  |
+2 | pub mod transaction_test;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519KeyPair`, `KeyPair`, `Signature`, `self`
+  --> src/tests/unit_tests/transaction_test.rs:11:23
+   |
+11 | use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+   |                       ^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:2:1
+   |
+2  | pub mod transaction_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `H256`, `Hashable`
+ --> src/tests/unit_tests/hash_test.rs:3:9
+  |
+3 |         H256, Hashable,
+  |         ^^^^  ^^^^^^^^
+  |
+help: consider adding a `#[cfg(test)]` to the containing module
+ --> src/tests/unit_tests/mod.rs:4:1
+  |
+4 | pub mod hash_test;
+  | ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `H256`, `Hashable`, `mempool::*`, `testimony::*`, `transaction::*`
+ --> src/tests/unit_tests/mempool_test.rs:3:9
+  |
+3 |         transaction::*,
+  |         ^^^^^^^^^^^^^^
+4 |         testimony::*,
+  |         ^^^^^^^^^^^^
+5 |         mempool::*,
+  |         ^^^^^^^^^^
+...
+8 |         H256,
+  |         ^^^^
+9 |         Hashable,
+  |         ^^^^^^^^
+  |
+help: consider adding a `#[cfg(test)]` to the containing module
+ --> src/tests/unit_tests/mod.rs:5:1
+  |
+5 | pub mod mempool_test;
+  | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> src/tests/unit_tests/mempool_test.rs:12:5
+   |
+12 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:5:1
+   |
+5  | pub mod mempool_test;
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `H256`, `Hashable`, `exclusive_block::*`, `inclusive_block::*`, `key_pair`, `testimony::*`, `transaction::*`, `versa_block::*`
+  --> src/tests/unit_tests/block_test.rs:4:13
+   |
+4  |             versa_block::*,
+   |             ^^^^^^^^^^^^^^
+5  |             exclusive_block::*,
+   |             ^^^^^^^^^^^^^^^^^^
+6  |             inclusive_block::*,
+   |             ^^^^^^^^^^^^^^^^^^
+7  |         },
+8  |         transaction::*,
+   |         ^^^^^^^^^^^^^^
+9  |         testimony::*,
+   |         ^^^^^^^^^^^^
+...
+13 |             H256,
+   |             ^^^^
+14 |             Hashable,
+   |             ^^^^^^^^
+15 |         },
+16 |         key_pair,
+   |         ^^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:6:1
+   |
+6  | pub mod block_test;
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519KeyPair`, `KeyPair`, `Signature`, `self`
+  --> src/tests/unit_tests/block_test.rs:19:23
+   |
+19 | use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+   |                       ^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:6:1
+   |
+6  | pub mod block_test;
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Hashable`
+  --> src/tests/unit_tests/database_test.rs:14:13
+   |
+14 |             Hashable,
+   |             ^^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:7:1
+   |
+7  | pub mod database_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `KeyPair`, `Signature`, `self`
+  --> src/tests/unit_tests/database_test.rs:19:23
+   |
+19 | use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+   |                       ^^^^                  ^^^^^^^^^  ^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:7:1
+   |
+7  | pub mod database_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DB`, `Options`
+  --> src/tests/unit_tests/database_test.rs:20:15
+   |
+20 | use rocksdb::{DB, Options};
+   |               ^^  ^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:7:1
+   |
+7  | pub mod database_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Deserialize`, `Serialize`
+  --> src/tests/unit_tests/database_test.rs:21:13
+   |
+21 | use serde::{Serialize, Deserialize};
+   |             ^^^^^^^^^  ^^^^^^^^^^^
+   |
+help: consider adding a `#[cfg(test)]` to the containing module
+  --> src/tests/unit_tests/mod.rs:7:1
+   |
+7  | pub mod database_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DateTime`, `Local`
+ --> src/tests/bash_tests/cloud_test.rs:1:14
+  |
+1 | use chrono::{DateTime, Local};
+  |              ^^^^^^^^  ^^^^^
+  |
+help: consider adding a `#[cfg(test)]` to the containing module
+ --> src/tests/bash_tests/mod.rs:1:1
+  |
+1 | pub mod cloud_test;
+  | ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration`, `SystemTime`, `UNIX_EPOCH`, `ops::Add`
+ --> src/tests/bash_tests/cloud_test.rs:2:18
+  |
+2 | use std::{time::{Duration, SystemTime, UNIX_EPOCH}, ops::Add};
+  |                  ^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^   ^^^^^^^^
+  |
+help: consider adding a `#[cfg(test)]` to the containing module
+ --> src/tests/bash_tests/mod.rs:1:1
+  |
+1 | pub mod cloud_test;
+  | ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `env`
+ --> src/tests/bash_tests/setup_bash.rs:4:5
+  |
+4 |     env,
+  |     ^^^
+
+warning: unused import: `manifoldchain::start as manifoldchain_start`
+  --> src/main.rs:13:5
+   |
+13 |     manifoldchain::start as manifoldchain_start,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated function `env_logger::from_env`: Prefer `env_logger::Builder::from_env()` instead.
+   --> src/manifoldchain/mod.rs:129:17
+    |
+129 |     env_logger::from_env(Env::default().default_filter_or("info")).init();
+    |                 ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated function `env_logger::from_env`: Prefer `env_logger::Builder::from_env()` instead.
+   --> src/optchain/mod.rs:129:17
+    |
+129 |     env_logger::from_env(Env::default().default_filter_or("info")).init();
+    |                 ^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> src/manifoldchain/network/server.rs:124:30
+    |
+124 |                         Some(mut peers) => {
+    |                              ----^^^^^
+    |                              |
+    |                              help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: variable does not need to be mutable
+   --> src/manifoldchain/network/server.rs:126:33
+    |
+126 | ...                   let mut hd = self.peers.get_mut(peer).unwrap();
+    |                           ----^^
+    |                           |
+    |                           help: remove this `mut`
+
+warning: unused variable: `bytes_read`
+   --> src/manifoldchain/network/server.rs:166:13
+    |
+166 |         let bytes_read = stream.read_exact(&mut buffer).await?;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bytes_read`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `bytes_read`
+   --> src/manifoldchain/network/server.rs:181:13
+    |
+181 |         let bytes_read = stream.read_exact(&mut buffer).await?;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bytes_read`
+
+warning: variable does not need to be mutable
+   --> src/optchain/network/server.rs:116:30
+    |
+116 |                         Some(mut peers) => {
+    |                              ----^^^^^
+    |                              |
+    |                              help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/optchain/network/server.rs:118:33
+    |
+118 | ...                   let mut hd = self.peers.get_mut(peer).unwrap();
+    |                           ----^^
+    |                           |
+    |                           help: remove this `mut`
+
+warning: unused variable: `bytes_read`
+   --> src/optchain/network/server.rs:158:13
+    |
+158 |         let bytes_read = stream.read_exact(&mut buffer).await?;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bytes_read`
+
+warning: unused variable: `bytes_read`
+   --> src/optchain/network/server.rs:173:13
+    |
+173 |         let bytes_read = stream.read_exact(&mut buffer).await?;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bytes_read`
+
+warning: unreachable statement
+   --> src/manifoldchain/validator/mod.rs:819:9
+    |
+818 |         return Ok(true);
+    |         --------------- any code following this expression is unreachable
+819 |         let tx_hash = tx.hash();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^ unreachable statement
+    |
+    = note: `#[warn(unreachable_code)]` on by default
+
+warning: unreachable statement
+   --> src/manifoldchain/validator/mod.rs:953:9
+    |
+952 |           return true;
+    |           ----------- any code following this expression is unreachable
+953 | /         if let FraudProof::UnsolvedFault = fraud_proof {
+954 | |             return true;
+955 | |         }
+    | |_________^ unreachable statement
+
+warning: unreachable statement
+    --> src/manifoldchain/validator/mod.rs:1156:17
+     |
+1145 | /                 match fp.conflict_tx.outputs.get(utxo_index) {
+1146 | |                     Some(output) => {
+1147 | |                         let pub_key = output.public_key_ref.clone();
+1148 | |                         return !Transaction::verify(
+...    |
+1154 | |                     None => return true,
+1155 | |                 }
+     | |_________________- any code following this `match` expression is unreachable, as all arms diverge
+1156 |                   break;
+     |                   ^^^^^^ unreachable statement
+
+warning: unreachable statement
+    --> src/manifoldchain/validator/mod.rs:1242:9
+     |
+1241 |           return true;
+     |           ----------- any code following this expression is unreachable
+1242 | /         if samples.len() < self.config.tx_merkle_proof_len {
+1243 | |             return false;
+1244 | |         }
+     | |_________^ unreachable statement
+
+error[E0433]: failed to resolve: use of undeclared type `ManifoldMinerWorker`
+   --> src/optchain/mod.rs:335:28
+    |
+335 |     let miner_worker_ctx = ManifoldMinerWorker::new(
+    |                            ^^^^^^^^^^^^^^^^^^^ use of undeclared type `ManifoldMinerWorker`
+
+warning: unused import: `Info`
+ --> src/optchain/multichain/mod.rs:6:13
+  |
+6 |             Info,
+  |             ^^^^
+
+warning: unused import: `Content`
+ --> src/optchain/validator/mod.rs:7:13
+  |
+7 |             Content, 
+  |             ^^^^^^^
+
+warning: unused import: `Info`
+  --> src/manifoldchain/miner/mod.rs:23:13
+   |
+23 |             Info,
+   |             ^^^^
+
+warning: unused import: `Content`
+  --> src/manifoldchain/validator/mod.rs:11:13
+   |
+11 |             Content, 
+   |             ^^^^^^^
+
+warning: unused import: `Info`
+  --> src/manifoldchain/confirmation/mod.rs:17:13
+   |
+17 |             Info,
+   |             ^^^^
+
+warning: unused import: `Content`
+  --> src/manifoldchain/confirmation/mod.rs:18:13
+   |
+18 |             Content,
+   |             ^^^^^^^
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `optchain` (bin "optchain") due to previous error; 115 warnings emitted
