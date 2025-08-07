@@ -11,8 +11,6 @@ use crate::{
         transaction::{
             Transaction,
             TxFlag,
-            UtxoInput,
-            UtxoOutput,
         },
         configuration::Configuration,
         validator::Validator,
@@ -35,8 +33,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 use rand::{self, Rng};
-use log::{info, debug};
-use ring::signature::{Ed25519KeyPair, KeyPair};
+use log::{info};
+use ring::signature::{Ed25519KeyPair};
 use reqwest;
 
 pub enum ControlSignal {

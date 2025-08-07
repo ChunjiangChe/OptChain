@@ -1,4 +1,4 @@
-use rand::{self, Rng};
+use rand::{self};
 use crate::{
     manifoldchain::{
         transaction::*,

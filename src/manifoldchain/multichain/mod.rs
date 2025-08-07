@@ -7,7 +7,6 @@ use crate::{
         },
         configuration::Configuration,
         block::{
-            Info,
             versa_block::VersaBlock,
             consensus_block::ConsensusBlock,
         },

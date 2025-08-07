@@ -8,21 +8,19 @@ use crossbeam::channel::{
     TryRecvError
 };
 use std::{
-    time::{self, SystemTime}, 
+    time::{self}, 
     thread, 
     sync::{Arc, Mutex},
     collections::HashMap,
 };
 use crate::{        
     types::{
-        merkle::MerkleTree, 
         hash::{H256, Hashable},
     }, 
     manifoldchain::{
         block::{
-            Info,
+            // Info,
             Content,
-            BlockHeader,
             consensus_block::ConsensusBlock,
             exclusive_block::ExclusiveBlock,
             inclusive_block::InclusiveBlock,
@@ -42,7 +40,6 @@ use crate::{
         mempool::Mempool,
         testimony::{
             Testimony,
-            TestimonyUnit,
         },
     },
 };

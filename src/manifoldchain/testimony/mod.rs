@@ -7,11 +7,7 @@ use crate::{
         block::{
             versa_block::{
                 VersaBlock,
-                ExclusiveFullBlock,
-                InclusiveFullBlock,
             },
-            exclusive_block::ExclusiveBlock,
-            inclusive_block::InclusiveBlock,
         },
         validator::Validator,
     }

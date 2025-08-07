@@ -6,16 +6,12 @@ use crate::{
     },
     optchain::{
         block::{
-            Block,
-            proposer_block::ProposerBlock,
-            availability_block::AvailabilityBlock,
             transaction_block::TransactionBlock,
             versa_block::{
                 VersaBlock,
                 VersaHash,
             }
         },
-        transaction::Transaction,
         symbolpool::{SymbolIndex, Symbol},
     }
 };

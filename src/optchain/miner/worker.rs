@@ -5,9 +5,6 @@ use crate::{
         block::{
             Info,
             Content,
-            transaction_block::TransactionBlock,
-            proposer_block::ProposerBlock,
-            availability_block::AvailabilityBlock,
             versa_block::{
                 VersaBlock,
                 VersaHash,
@@ -19,7 +16,6 @@ use crate::{
         },
         multichain::Multichain,
         miner::MinerMessage,
-        transaction::Transaction,
         configuration::Configuration,
         mempool::Mempool,
         symbolpool::{
@@ -32,7 +28,6 @@ use crate::{
 use std::{
     thread, 
     sync::{Arc, Mutex},
-    collections::HashMap,
 };
 
 #[derive(Clone)]

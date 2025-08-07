@@ -8,11 +8,8 @@ use crate::{
             peer,
             server::Handle as ServerHandle,
         },
-        transaction::{Transaction},
         block::{
             Info, 
-            proposer_block::ProposerBlock,
-            availability_block::AvailabilityBlock,
             transaction_block::TransactionBlock,
             versa_block::{
                 VersaBlock,
@@ -20,7 +17,7 @@ use crate::{
             }
         },
         configuration::Configuration,
-        validator::{Validator, ValidationSource},
+        validator::{Validator},
         mempool::Mempool,
         multichain::Multichain,
         symbolpool::{
@@ -32,12 +29,10 @@ use crate::{
 };
 use log::{debug, warn, error, info};
 use std::{
-    time::{self, SystemTime},
     thread,
     sync::{Arc,Mutex},
     collections::{HashMap, VecDeque},
 };
-use rand::Rng;
 
 //#[cfg(any(test,test_utilities))]
 //use super::peer::TestReceiver as PeerTestReceiver;
@@ -184,7 +179,7 @@ impl Worker {
                 }
                 Message::Symbols(samples) => {
                     //debug!("Coming Samples");
-                    let (response_1) = self
+                    let response_1 = self
                         .handle_symbols(samples);
                     if let Some(res_1) = response_1 {
                         self.server.broadcast(res_1);

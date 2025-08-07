@@ -7,14 +7,8 @@ use crate::{
         multichain::Multichain,
         transaction::{Transaction, UtxoInput, TxFlag},
         block::{
-            Info, 
-            Content, 
-            exclusive_block::ExclusiveBlock,
-            inclusive_block::InclusiveBlock,
             versa_block::{
                 VersaBlock,
-                ExclusiveFullBlock,
-                InclusiveFullBlock,
             },
         },
         configuration::Configuration,
@@ -46,7 +40,17 @@ use std::{
     sync::{Arc, Mutex},
     collections::HashMap,
 };
-use log::{info, debug};
+use log::{info};
+
+
+#[allow(unused_imports)]
+use crate::{
+    manifoldchain::{
+        block::{
+            Info,
+        }
+    }
+};
 
 pub struct Validator {
     multichain: Multichain,
@@ -809,6 +813,7 @@ impl Validator {
 
     }
 
+    #[allow(unreachable_code)]
     pub fn check_accept_reject_tx(
         &self,
         tx: &Transaction,
@@ -947,6 +952,7 @@ impl Validator {
         }
     }
 
+    #[allow(unreachable_code)]
     pub fn verify_fraud_proof(&self, fraud_proof: &FraudProof) -> bool {
         //need to be completed in the future
         return true;
@@ -1153,7 +1159,7 @@ impl Validator {
                     }
                     None => return true,
                 }
-                break;
+                // break;
             }    
         }
 
@@ -1237,6 +1243,7 @@ impl Validator {
         }
         res 
     }
+    #[allow(unreachable_code)]
     pub fn verify_samples(&self, sample_index: &SampleIndex, samples: Vec<Sample>) -> bool {
         return true;
         if samples.len() < self.config.tx_merkle_proof_len {

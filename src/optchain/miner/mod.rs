@@ -1,6 +1,6 @@
 pub mod worker;
 
-use log::{info, debug};
+use log::{info};
 use crossbeam::channel::{
     unbounded, 
     Receiver, 
@@ -8,22 +8,18 @@ use crossbeam::channel::{
     TryRecvError
 };
 use std::{
-    time::{self, SystemTime}, 
+    time::{self}, 
     thread, 
     sync::{Arc, Mutex},
-    collections::HashMap,
 };
 use crate::{        
     types::{
-        merkle::MerkleTree, 
         hash::{H256, Hashable},
     }, 
     optchain::{
         block::{
-            Info,
             Content,
             BlockContent,
-            BlockHeader,
             Block,
             transaction_block::TransactionBlock,
             proposer_block::ProposerBlock,
@@ -31,7 +27,7 @@ use crate::{
             versa_block::VersaBlock,
         },
         multichain::Multichain,
-        transaction::{Transaction, TxFlag},
+        transaction::{Transaction},
         validator::{
             Validator,
         },

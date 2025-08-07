@@ -13,7 +13,7 @@ use crate::{
     },
 };
 use serde::{Serialize, Deserialize};
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::time::{SystemTime};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ConsensusBlock {

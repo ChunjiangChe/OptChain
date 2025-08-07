@@ -1,19 +1,4 @@
 use crate::{
-    manifoldchain::{
-        block::{
-            versa_block::{
-                ExclusiveFullBlock,
-                InclusiveFullBlock,
-                VersaBlock,
-            },
-        },
-        transaction::{
-            Transaction,
-        },
-        testimony::{
-            Testimony,
-        },
-    },
     types::{
         hash::{
             H256,
@@ -21,8 +6,8 @@ use crate::{
         },
     }
 };
-use rocksdb::{DB, Options, DBIterator, Direction, IteratorMode};
-use serde::{Serialize, Deserialize, de::DeserializeOwned};
+use rocksdb::{DB, Options, IteratorMode};
+use serde::{Serialize, de::DeserializeOwned};
 use std::{
     collections::HashMap,
 };

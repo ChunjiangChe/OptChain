@@ -39,15 +39,15 @@ use crate::{
 };
 
 
-use crossbeam::channel::{
-    unbounded,
-    Receiver,
-    Sender,
-    TryRecvError,
-};
+// use crossbeam::channel::{
+//     unbounded,
+//     Receiver,
+//     Sender,
+//     TryRecvError,
+// };
 use clap::clap_app;
 use smol::channel;
-use log::{error, info, debug};
+use log::{error, info};
 use std::{
     net, 
     process, 
@@ -126,7 +126,7 @@ pub fn start() {
     .get_matches();
 
     // init logger
-    env_logger::from_env(Env::default().default_filter_or("info")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     //let verbosity = matches.occurrences_of("verbose") as usize;
     //stderrlog::new().verbosity(verbosity).init().unwrap();
 

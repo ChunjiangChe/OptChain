@@ -10,7 +10,7 @@ pub mod tests;
 
 use crate::{
     // bitcoin::start as bitcoin_start,
-    manifoldchain::start as manifoldchain_start,
+    // manifoldchain::start as manifoldchain_start,
     optchain::start as optchain_start,
 };
 

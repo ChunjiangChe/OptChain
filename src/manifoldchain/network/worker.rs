@@ -31,7 +31,7 @@ use crate::{
 };
 use log::{debug, warn, error, info};
 use std::{
-    time::{self, SystemTime},
+    time::{self},
     thread,
     sync::{Arc,Mutex},
     collections::HashMap,

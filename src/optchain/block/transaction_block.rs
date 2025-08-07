@@ -1,20 +1,20 @@
 use crate::{
     types::{
         hash::{H256, Hashable},
-        merkle::MerkleTree,
+        // merkle::MerkleTree,
     },
     optchain::{
         block::{
             BlockHeader, 
-            BlockContent,
+            // BlockContent,
             Info,
         },
-        transaction::Transaction,
+        // transaction::Transaction,
     }
 };
 use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+// use std::collections::HashMap;
+use std::time::{SystemTime};
 
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, Hash, PartialEq)]
 pub struct TransactionBlock {

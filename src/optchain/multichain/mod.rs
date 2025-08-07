@@ -3,13 +3,12 @@ use crate::{
         blockchain::Blockchain,
         configuration::Configuration,
         block::{
-            Info,
+            // Info,
             versa_block::{VersaHash, VersaBlock},
             transaction_block::TransactionBlock,
             proposer_block::ProposerBlock,
             availability_block::AvailabilityBlock,
         },
-        transaction::Transaction,
     },
     types::{
         hash::H256,
@@ -17,7 +16,6 @@ use crate::{
 };
 use std::{
     sync::{Arc, Mutex},
-    collections::HashMap,
 };
 
 

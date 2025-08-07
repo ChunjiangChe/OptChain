@@ -9,11 +9,10 @@ use crate::{
             BlockHeader,
             transaction_block::TransactionBlock,
         },
-        transaction::Transaction,
     },
 };
 use serde::{Serialize, Deserialize};
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::time::{SystemTime};
 
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, Hash, PartialEq)]
 pub struct AvailabilityBlock {

@@ -2,19 +2,14 @@ use crate::{
     optchain::{
         block::{
             Info,
-            Content,
             proposer_block::ProposerBlock,
             availability_block::AvailabilityBlock,
-            transaction_block::TransactionBlock,
         },
-        transaction::Transaction,
-        network::worker::Sample,
     },
     types::hash::{H256, Hashable},
 };
 use std::{
     time::SystemTime,
-    collections::HashMap,
 };
 use serde::{Serialize, Deserialize};
 

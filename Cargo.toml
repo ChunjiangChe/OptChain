@@ -31,7 +31,7 @@ rocksdb = "0.21.0"
 
 [features]
 default = []
-test-utilities = []
+test_utilities = []
 
 [dev-dependencies]
 ntest = "0.7"

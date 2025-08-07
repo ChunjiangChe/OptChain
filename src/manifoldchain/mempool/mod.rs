@@ -9,11 +9,9 @@ use crate::{
             TestimonyUnit,
         },
         database::Database,
-        configuration::Configuration,
     },
 };
 use std::collections::{VecDeque, HashMap};
-use log::{info, debug};
 use std::time::{SystemTime};
 
 pub struct Mempool {

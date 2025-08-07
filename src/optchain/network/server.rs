@@ -17,7 +17,7 @@ use futures::{
     channel::oneshot, stream::StreamExt
 };
 use smol::{Async, Executor};
-use log::{info, trace, debug};
+use log::{info, trace};
 use std::{
     net,
     sync::Arc,
@@ -112,10 +112,19 @@ impl Context {
                     trace!("Processing BroadcastMessageWithShard command");
                     let shard_id = shard_id as usize;
                     
+                    // match self.peers_by_shard.get_mut(&shard_id) {
+                    //     Some(mut peers) => {
+                    //         for peer in peers.iter_mut() {
+                    //         let mut hd = self.peers.get_mut(peer).unwrap();
+                    //             hd.write(msg.clone());
+                    //         }
+                    //     }
+                    //     None => {}
+                    // }
                     match self.peers_by_shard.get_mut(&shard_id) {
-                        Some(mut peers) => {
+                        Some(peers) => {
                             for peer in peers.iter_mut() {
-                            let mut hd = self.peers.get_mut(peer).unwrap();
+                            let hd = self.peers.get_mut(peer).unwrap();
                                 hd.write(msg.clone());
                             }
                         }
@@ -155,7 +164,7 @@ impl Context {
         stream.write_all(&serialized_shard_id).await?; 
         //receive the shard id from incoming peer
         let mut buffer = [0u8; std::mem::size_of::<u32>()];
-        let bytes_read = stream.read_exact(&mut buffer).await?;
+        let _ = stream.read_exact(&mut buffer).await?;
         let received_shard_id = u32::from_be_bytes(buffer);
         info!("Connecting node's shard id: {}", received_shard_id);
 
@@ -170,7 +179,7 @@ impl Context {
     ) -> std::io::Result<()> {
         //receive the shard id from incoming peer
         let mut buffer = [0u8; std::mem::size_of::<u32>()];
-        let bytes_read = stream.read_exact(&mut buffer).await?;
+        let _ = stream.read_exact(&mut buffer).await?;
         let received_shard_id = u32::from_be_bytes(buffer);
         //send the shard id to the outgoing peer
         let shard_id = self.shard_id as u32;

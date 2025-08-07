@@ -6,12 +6,9 @@ use crate::{
     },
     manifoldchain::{
         block::{
-            Block,
             exclusive_block::ExclusiveBlock,
             inclusive_block::InclusiveBlock,
             versa_block::{
-                VersaBlock,
-                VersaHash,
                 ExclusiveFullBlock,
                 InclusiveFullBlock,
             }

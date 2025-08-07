@@ -7,9 +7,9 @@ use crate::{
         database::Database,
     },
 };
-use std::collections::{VecDeque, HashMap};
-use log::{info, debug};
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::collections::{VecDeque};
+// use log::{info, debug};
+use std::time::{SystemTime};
 
 
 pub struct Mempool {

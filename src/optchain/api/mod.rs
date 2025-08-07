@@ -13,12 +13,12 @@ use crate::{
         },
         configuration::Configuration,
     },
-    types::{
-        hash::{
-            H256,
-            Hashable,
-        }
-    },
+    // types::{
+    //     hash::{
+    //         H256,
+    //         Hashable,
+    //     }
+    // },
 };
 
 use log::{info};
@@ -61,14 +61,14 @@ macro_rules! respond_result {
         $req.respond(resp).unwrap();
     }};
 }
-macro_rules! respond_json {
-    ( $req:expr, $message:expr ) => {{
-        let content_type = "Content-Type: application/json".parse::<Header>().unwrap();
-        let resp = Response::from_string(serde_json::to_string(&$message).unwrap())
-            .with_header(content_type);
-        $req.respond(resp).unwrap();
-    }};
-}
+// macro_rules! respond_json {
+//     ( $req:expr, $message:expr ) => {{
+//         let content_type = "Content-Type: application/json".parse::<Header>().unwrap();
+//         let resp = Response::from_string(serde_json::to_string(&$message).unwrap())
+//             .with_header(content_type);
+//         $req.respond(resp).unwrap();
+//     }};
+// }
 
 impl Server {
     pub fn start(

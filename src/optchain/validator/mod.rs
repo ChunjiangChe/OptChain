@@ -1,32 +1,27 @@
 use crate::{
     optchain::{
         multichain::Multichain,
-        transaction::{Transaction, UtxoInput, TxFlag},
         block::{
-            Info, 
-            Content, 
-            proposer_block::ProposerBlock,
-            availability_block::AvailabilityBlock,
-            transaction_block::TransactionBlock,
+            // Content, 
             versa_block::VersaBlock,
         },
         configuration::Configuration,
         mempool::Mempool,
-        symbolpool::{
-            SymbolIndex,
-            Symbol,
-        },
+        // symbolpool::{
+        //     SymbolIndex,
+        //     Symbol,
+        // },
     },
     types::{
-        hash::{Hashable, H256},
-        merkle::MerkleTree,
+        hash::{Hashable},
+        // merkle::MerkleTree,
     },
 };
 use std::{
     sync::{Arc, Mutex},
-    collections::HashMap,
+    // collections::HashMap,
 };
-use log::{info, debug};
+// use log::{info, debug};
 
 pub struct Validator {
     multichain: Multichain,

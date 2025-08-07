@@ -7,12 +7,8 @@ use crate::{
             Info,
             Content,
             exclusive_block::ExclusiveBlock,
-            inclusive_block::InclusiveBlock,
-            transaction_block::TransactionBlock,
             consensus_block::ConsensusBlock,
             versa_block::{
-                ExclusiveFullBlock,
-                InclusiveFullBlock,
                 VersaBlock,
             }
         },
@@ -26,7 +22,6 @@ use crate::{
         configuration::Configuration,  
         validator::{
             Validator,
-            CrossUtxoStatus,
         },
         database::Database,
     }
@@ -38,7 +33,7 @@ use std::{
     io::{Write, Error},
     time::SystemTime,
 };
-use log::{debug, info};
+use log::{info};
 use chrono::{DateTime, Local};
 
 #[derive(Clone)]

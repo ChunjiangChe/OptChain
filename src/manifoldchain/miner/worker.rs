@@ -1,5 +1,5 @@
 use crossbeam::channel::Receiver;
-use log::{debug, info};
+use log::{info};
 use crate::{
     manifoldchain::{
         block::{
@@ -14,7 +14,7 @@ use crate::{
         network::{
             server::Handle as ServerHandle,
             message::Message,
-            worker::{SampleIndex, Sample},
+            worker::{SampleIndex},
         },
         multichain::Multichain,
         miner::MinerMessage,
@@ -179,7 +179,7 @@ impl Worker {
                     for (inter_parents, shard_id) in global_parents {
                         info!("inter_parents size: {}", inter_parents.len());
                         for parent in inter_parents {
-                            let inserted_block = match (shard_id == self.config.shard_id) {
+                            let inserted_block = match shard_id == self.config.shard_id {
                                 true => VersaBlock::InFullBlock(in_full_block.clone()),
                                 false => VersaBlock::InBlock(in_block.clone()),
                             };

@@ -27,7 +27,7 @@ pub struct Handle {
     write_queue: mpsc::UnboundedSender<Vec<u8>>,
 }
 
-#[cfg(any(test,test_utilities))]
+#[cfg(any(test,feature = "test_utilities"))]
 pub struct TestReceiver {
     r: mpsc::UnboundedReceiver<Vec<u8>>
 }
@@ -46,7 +46,7 @@ impl Handle {
         &self.addr
     }
 
-    #[cfg(any(test,test_utilities))]
+    #[cfg(any(test,feature = "test_utilities"))]
     pub fn test_handle() -> (Handle, TestReceiver) {
         let (s,r) = mpsc::unbounded();
         (Handle {
@@ -59,7 +59,7 @@ impl Handle {
     }
 }
 
-#[cfg(any(test,test_utilities))]
+#[cfg(any(test,feature = "test_utilities"))]
 impl TestReceiver {
     pub fn recv(&mut self) -> Message {
         let bytes = smol::block_on(futures::stream::StreamExt::next(&mut self.r)).unwrap();

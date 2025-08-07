@@ -5,33 +5,18 @@ use crate::{
     optchain::{
         block::{
             Info,
-            Content,
             transaction_block::TransactionBlock,
-            proposer_block::ProposerBlock,
-            availability_block::AvailabilityBlock,
             versa_block::VersaBlock,
         },
-        transaction::{
-            Transaction,
-            TxFlag,
-        },
         configuration::Configuration,  
-        validator::{
-            Validator,
-            CrossUtxoStatus,
-        },
         database::Database,
     }
 };
 use std::{
     cmp,
     collections::{HashMap, VecDeque},
-    fs::File,
-    io::{Write, Error},
 };
-use log::{debug};
-use chrono::{DateTime, Local};
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::time::{SystemTime};
 
 #[derive(Clone)]
 pub struct Node {

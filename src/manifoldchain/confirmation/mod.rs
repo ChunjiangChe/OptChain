@@ -1,30 +1,17 @@
 //copy from validator
-
-use log::{info, debug};
 use std::{
-    time::{self, SystemTime}, 
-    thread, 
-    sync::{Arc, Mutex},
     collections::HashMap,
 };
 use crate::{        
     types::{
-        merkle::MerkleTree, 
         hash::{H256, Hashable},
     }, 
     manifoldchain::{
         block::{
             Info,
             Content,
-            BlockHeader,
-            consensus_block::ConsensusBlock,
-            exclusive_block::ExclusiveBlock,
-            inclusive_block::InclusiveBlock,
-            transaction_block::TransactionBlock,
             versa_block::{
                 VersaBlock,
-                ExclusiveFullBlock,
-                InclusiveFullBlock,
             }
         },
         multichain::Multichain,
@@ -33,18 +20,12 @@ use crate::{
             Validator,
         },
         configuration::Configuration,
-        mempool::Mempool,
         testimony::{
             Testimony,
             TestimonyUnit,
         },
-        network::{
-            server::Handle as ServerHandle,
-            message::Message,
-        }
     },
 };
-use rand::Rng;
 
 pub type BlockLocate = (H256, usize); //(block hash, shard id)
 pub type TxLocate = (H256, H256); //(block hash, tx hash)
