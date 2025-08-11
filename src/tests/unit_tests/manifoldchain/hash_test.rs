@@ -1,4 +1,9 @@
-
+#[cfg(test)]
+use crate::{
+    types::{
+        hash::H256,
+    },
+};
 
 
 #[test]

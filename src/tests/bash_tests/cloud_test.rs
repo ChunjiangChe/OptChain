@@ -1,7 +1,9 @@
+// #[cfg(test)]
 // use chrono::{DateTime, Local};
-// use std::{time::{Duration, SystemTime, UNIX_EPOCH}, ops::Add};
-#[test]
+#[cfg(test)]
+use std::{time::{Duration, SystemTime, UNIX_EPOCH}, ops::Add};
 
+#[test]
 fn cloud_test() {
     let d1 = Duration::new(1695004834, 360119220);
     let d2 = Duration::new(1695004894, 449808621);

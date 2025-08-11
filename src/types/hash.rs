@@ -1,10 +1,14 @@
 use serde::{Serialize, Deserialize};
 use std::convert::TryInto;
-#[cfg(any(test))]
 // #[cfg(any(test, test_utilities))]
 use rand::Rng;
 use array_init::array_init;
 use hex::{encode, decode};
+use crate::{
+    types::{
+        random::Random,
+    },
+};
 
 /// An object that can be meaningfully hashed.
 pub trait Hashable {
@@ -66,6 +70,16 @@ pub struct H256(pub [u8; 32]); // big endian u256
 impl Default for H256 {
     fn default() -> Self {
         (&[255u8; 32]).into()
+    }
+}
+
+impl Random for H256 {
+    fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let random_bytes: Vec<u8> = (0..32).map(|_| rng.gen()).collect();
+        let mut raw_bytes = [0; 32];
+        raw_bytes.copy_from_slice(&random_bytes);
+        (&raw_bytes).into()
     }
 }
 
@@ -202,11 +216,11 @@ impl PartialOrd for H256 {
 }
 
 // #[cfg(any(test, test_utilities))]
-#[cfg(any(test))]
-pub fn generate_random_hash() -> H256 {
-    let mut rng = rand::thread_rng();
-    let random_bytes: Vec<u8> = (0..32).map(|_| rng.gen()).collect();
-    let mut raw_bytes = [0; 32];
-    raw_bytes.copy_from_slice(&random_bytes);
-    (&raw_bytes).into()
-}
+// #[cfg(any(test))]
+// pub fn generate_random_hash() -> H256 {
+//     let mut rng = rand::thread_rng();
+//     let random_bytes: Vec<u8> = (0..32).map(|_| rng.gen()).collect();
+//     let mut raw_bytes = [0; 32];
+//     raw_bytes.copy_from_slice(&random_bytes);
+//     (&raw_bytes).into()
+// }

@@ -25,6 +25,7 @@ fn gen_rand_hash() -> H256 {
 
 
 #[test]
+#[allow(unused_variables)]
 fn node_test_one() {
     let root_hash = gen_rand_hash();
     let mut root = Box::new(Node {
@@ -295,6 +296,7 @@ fn node_test_one() {
 }
 
 #[test]
+#[allow(unused_variables)]
 fn blockchain_test_two() {
     //demo:
     //user_id: 2 and 4 in shard_0, 3 in shard_1

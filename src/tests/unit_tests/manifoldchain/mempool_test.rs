@@ -1,7 +1,8 @@
+#[cfg(test)]
 use crate::{
     manifoldchain::{
         transaction::*,
-        testimony::*,
+        // testimony::*,
         mempool::*,
     },
     types::hash::{
@@ -9,6 +10,7 @@ use crate::{
         Hashable,
     },
 };
+#[cfg(test)]
 use std::collections::HashMap;
 
 #[test]
@@ -191,13 +193,13 @@ fn mempool_test_three() {
         Some(_) => {
             panic!("mempool_test_3 failure");
         }
-        Non => {}
+        None => {}
     }
     match mempool.get_tx(&tx3_hash) {
         Some(_) => {
             panic!("mempool_test_3 failure");
         }
-        Non => {}
+        None => {}
     }      
 
     let txs = mempool.get_all_txs();

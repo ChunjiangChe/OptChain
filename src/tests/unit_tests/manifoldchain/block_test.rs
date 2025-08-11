@@ -1,9 +1,10 @@
+#[cfg(test)]
 use crate::{
     manifoldchain::{
         block::{
             versa_block::*,
-            exclusive_block::*,
-            inclusive_block::*,
+            // exclusive_block::*,
+            // inclusive_block::*,
         },
         transaction::*,
         testimony::*,
@@ -11,13 +12,16 @@ use crate::{
     types::{
         hash::{
             H256,
-            Hashable,
+            // Hashable,
         },
         key_pair,
     }
 };
-use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+#[cfg(test)]
+// use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+use ring::signature::{Ed25519KeyPair};
 #[test]
+#[allow(unused_variables)]
 fn block_test_one() {
     //generate some users
     let user2: H256 = (&[2u8; 32]).into();

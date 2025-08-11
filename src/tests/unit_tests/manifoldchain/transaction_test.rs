@@ -1,18 +1,22 @@
-use rand::{self};
+// #[cfg(test)]
+// use rand::{self};
+#[cfg(test)]
 use crate::{
     manifoldchain::{
         transaction::*,
     },
     types::{
         key_pair,
-        hash::{Hashable, H256},
+        hash::{H256},
     }
 };
-use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+#[cfg(test)]
+// use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+use ring::signature::{Ed25519KeyPair};
 
 
 #[test]
-
+#[allow(unused_variables)]
 fn transaction_test_one() {
     let user1: H256 = (&[1u8; 32]).into();
     let user2: H256 = (&[2u8; 32]).into();

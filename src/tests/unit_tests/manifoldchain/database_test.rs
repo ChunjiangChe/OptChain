@@ -1,3 +1,4 @@
+#[cfg(test)]
 use crate::{
     manifoldchain::{
         block::{
@@ -16,11 +17,16 @@ use crate::{
         key_pair,
     }
 };
-use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+#[cfg(test)]
+// use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
+use ring::signature::{Ed25519KeyPair};
+#[cfg(test)]
 use rocksdb::{DB, Options};
-use serde::{Serialize, Deserialize};
+#[cfg(test)]
+// use serde::{Serialize, Deserialize};
 
-
+#[cfg(test)]
+#[allow(unused_variables)]
 fn generate_random_datatypes() 
 -> (ExclusiveFullBlock, ExclusiveBlock, InclusiveFullBlock, InclusiveBlock, Transaction, Testimony) 
 {
@@ -111,6 +117,7 @@ fn generate_random_datatypes()
 } 
 
 #[test]
+// #[allow(unused_variables)]
 fn database_test_one() {
     let path = "./DB/test_data";
     let mut options = Options::default();
@@ -137,7 +144,7 @@ fn database_test_one() {
         Ok(None) => {
             panic!("Key not found");
         }
-        Err(e) => {
+        Err(_) => {
             panic!("Erros");
         }
     }
@@ -158,7 +165,7 @@ fn database_test_one() {
         Ok(None) => {
             panic!("Key not found");
         }
-        Err(e) => {
+        Err(_) => {
             panic!("Erros");
         }
     }
@@ -182,7 +189,7 @@ fn database_test_one() {
         Ok(None) => {
             panic!("Key not found");
         }
-        Err(e) => {
+        Err(_) => {
             panic!("Erros");
         }
     }
@@ -203,7 +210,7 @@ fn database_test_one() {
         Ok(None) => {
             panic!("Key not found");
         }
-        Err(e) => {
+        Err(_) => {
             panic!("Erros");
         }
     }
@@ -223,7 +230,7 @@ fn database_test_one() {
         Ok(None) => {
             panic!("Key not found");
         }
-        Err(e) => {
+        Err(_) => {
             panic!("Erros");
         }
     }
@@ -243,7 +250,7 @@ fn database_test_one() {
         Ok(None) => {
             panic!("Key not found");
         }
-        Err(e) => {
+        Err(_) => {
             panic!("Erros");
         }
     }
