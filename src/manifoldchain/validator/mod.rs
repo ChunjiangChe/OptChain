@@ -343,11 +343,11 @@ impl Validator {
                 return Err(FraudProof::UnsolvedFault);              
             }
         }
-        let states = self.multichain.get_states();
+        // let states = self.multichain.get_states();
 
-        let state = states
-            .get(parent)
-            .unwrap();
+        // let state = states
+        //     .get(parent)
+        //     .unwrap();
 
 
         //check whether the transactions inside are invalid
@@ -813,7 +813,7 @@ impl Validator {
 
     }
 
-    #[allow(unreachable_code)]
+    #[allow(unreachable_code, unused_variables)]
     pub fn check_accept_reject_tx(
         &self,
         tx: &Transaction,
@@ -821,7 +821,7 @@ impl Validator {
     ) -> Result<bool, FraudProof> {
         //simply
         return Ok(true);
-        let tx_hash = tx.hash();
+        // let tx_hash = tx.hash();
         let mut input_tx = tx.clone();
         input_tx.flag = TxFlag::Input;
         if let None = self.multichain
@@ -844,7 +844,7 @@ impl Validator {
                 CrossUtxoStatus::Confirmed,
             ){
                 Ok(_) => {}
-                Err(e) => {
+                Err(_) => {
                      return Err(FraudProof::WrongTestimony(
                         WrongTestimonyProof {
                             shard_id: self.config.shard_id as u32,
@@ -952,7 +952,7 @@ impl Validator {
         }
     }
 
-    #[allow(unreachable_code)]
+    #[allow(unreachable_code, unused_variables)]
     pub fn verify_fraud_proof(&self, fraud_proof: &FraudProof) -> bool {
         //need to be completed in the future
         return true;
@@ -1008,11 +1008,11 @@ impl Validator {
 
     fn verify_doublespending_fp(&self, fp: &DoubleSpendingProof) -> bool {
         let shard_id = fp.shard_id as usize;
-        let invalid_block = match self.multichain
-            .get_block_by_shard(&fp.invalid_block_hash, shard_id) {
-            Some(block) => block,
-            None => return false,
-        };
+        // let invalid_block = match self.multichain
+        //     .get_block_by_shard(&fp.invalid_block_hash, shard_id) {
+        //     Some(block) => block,
+        //     None => return false,
+        // };
 
 
         let conflict_block = match self.multichain
@@ -1068,7 +1068,7 @@ impl Validator {
         return false;
     }
 
-    fn verify_utxolost_fp(&self, fp: &UtxoLostProof) -> bool {
+    fn verify_utxolost_fp(&self, _fp: &UtxoLostProof) -> bool {
         //...
         true
     }
@@ -1107,11 +1107,11 @@ impl Validator {
 
     fn verify_wrongsig_fp(&self, fp: &WrongSignatureProof) -> bool {
         let shard_id = fp.shard_id as usize;
-        let invalid_block = match self.multichain
-            .get_block_by_shard(&fp.invalid_block_hash, shard_id) {
-            Some(block) => block,
-            None => return false,
-        };
+        // let invalid_block = match self.multichain
+        //     .get_block_by_shard(&fp.invalid_block_hash, shard_id) {
+        //     Some(block) => block,
+        //     None => return false,
+        // };
             
 
 
@@ -1166,7 +1166,7 @@ impl Validator {
         return false;       
     }
 
-    fn verify_tmylost_fp(&self, fp: &TestimonyLostProof) -> bool {
+    fn verify_tmylost_fp(&self, _fp: &TestimonyLostProof) -> bool {
         //...
         true
     }
@@ -1213,7 +1213,7 @@ impl Validator {
                     CrossUtxoStatus::Available
                 ) {
                     Ok(_) => {},
-                    Err(e) => return true,
+                    Err(_) => return true,
                 }
             }
         }
@@ -1243,7 +1243,7 @@ impl Validator {
         }
         res 
     }
-    #[allow(unreachable_code)]
+    #[allow(unreachable_code, unused_variables)]
     pub fn verify_samples(&self, sample_index: &SampleIndex, samples: Vec<Sample>) -> bool {
         return true;
         if samples.len() < self.config.tx_merkle_proof_len {

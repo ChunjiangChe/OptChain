@@ -625,7 +625,7 @@ impl Worker {
                         }
                     }
                 }
-                _ => unimplemented!()
+                // _ => unimplemented!()
             }
         }
     }
@@ -694,7 +694,7 @@ impl Worker {
         for tx in txs.iter() {
             //find tx in mempool
             let tx_hash = tx.hash();
-            if let Some(tx) = self.mempool.lock().unwrap().get_tx(&tx_hash) {
+            if let Some(_) = self.mempool.lock().unwrap().get_tx(&tx_hash) {
                 continue;
             }
             //2.validate the transaction
@@ -1138,8 +1138,10 @@ impl Worker {
                                 Some(fp) => {
                                     if self.validator.verify_fraud_proof(fp) {
                                         info!("skip block {:?}", new_hash);
-                                        let shard_id = fp.get_shard_id();
-                                        let block_hash = fp.get_invalid_block();
+                                        // let shard_id = fp.get_shard_id();
+                                        let _ = fp.get_shard_id();
+                                        // let block_hash = fp.get_invalid_block();
+                                        let _ = fp.get_invalid_block();
                                         //self.multichain.prune_fork_with_shard(&block_hash, shard_id);
                                         break;
                                     }
@@ -1210,7 +1212,7 @@ impl Worker {
 
         let res_fp: Vec<FraudProof> = fraud_proofs
             .into_iter()
-            .map(|(key, val)| key)
+            .map(|(key, _)| key)
             .collect();
 
         let res_blk_hash = match res_hash.is_empty() {
@@ -1402,7 +1404,7 @@ impl Worker {
             }
             if self.validator.verify_fraud_proof(&fp) {
                 let shard_id = fp.get_shard_id();
-                let block_hash = fp.get_invalid_block();
+                // let block_hash = fp.get_invalid_block();
                 if shard_id == self.config.shard_id {
                     continue;
                 }
@@ -1421,8 +1423,8 @@ impl Worker {
         let mut unreceived_samples: Vec<SampleIndex> = vec![];
 
         for sample in sample_index_vec {
-            let block_hash = sample.0.clone();
-            let tx_index = sample.1 as usize;
+            // let block_hash = sample.0.clone();
+            // let tx_index = sample.1 as usize;
             let shard_id = sample.2 as usize;
 
             if shard_id == self.config.shard_id {
@@ -1495,8 +1497,8 @@ impl Worker {
             let sample_key = sample.0;
             let sample_value = sample.1;
             let block_hash = sample_key.0.clone();
-            let tx_index = sample_key.1 as usize;
-            let shard_id = sample_key.2 as usize;
+            // let tx_index = sample_key.1 as usize;
+            // let shard_id = sample_key.2 as usize;
 
             //consider more here
             //if shard_id == self.config.shard_id {

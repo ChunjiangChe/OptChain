@@ -88,6 +88,8 @@ pub fn new_ctx(
     let mut users: HashMap<usize, H256> = HashMap::new();
     let mut keys: HashMap<H256, Ed25519KeyPair> = HashMap::new();
     
+    #[allow(unused_comparisons)]
+    //comparison is useless due to type limits: j, line 100
     for i in 0..config.shard_num {
         let mut random_bytes: [u8; 32] = rng.gen();
         let mut j = 31;
@@ -169,7 +171,7 @@ impl Context {
 
     fn generator_loop(&mut self) {
         let mut is_initial = true;
-        let mut no_utxo_count = 0;
+        // let mut no_utxo_count = 0;
         //main generating loop
         loop {
             //check and react to control signals
@@ -233,7 +235,7 @@ impl Context {
 
                 if is_initial {
                     //generate the initial balance for each user
-                    for i in 0..self.config.initial_utxo_num {
+                    for _ in 0..self.config.initial_utxo_num {
                         for item in self.keys.iter() {
                             let initial_tx = Transaction::create_initial_tx(
                                 (&item.0, &item.1),
@@ -260,7 +262,7 @@ impl Context {
 
                 //generating transactions
                 let mut rng = rand::thread_rng();
-                let num_node = self.users.len();
+                // let num_node = self.users.len();
                 let payer = self.users.get(&self.config.shard_id).unwrap().clone();
                 let domestic_ratio: f64 = self.config.domestic_tx_ratio;
                 let sample_range: usize = 10000;
@@ -343,7 +345,7 @@ impl Context {
                             self.mempool.lock().unwrap().insert_tx(tx.clone());
                         }
                     }
-                    no_utxo_count = 0;
+                    // no_utxo_count = 0;
                     //self.server.broadcast(Message::Transactions(txs));
                 } else {
                     info!("create another new initial tx");
@@ -427,15 +429,16 @@ impl Context {
             }
 
             
-            let available_utxo_hashs: Vec<(H256, u32)> = available_utxos
-                .iter()
-                .map(|x| (x.0.hash(), x.1) )
-                .collect();
-            let delete_used_utxo: HashMap<(H256, u32), bool> = self.used_utxo
-                .clone()
-                .into_iter()
-                .filter(|(key, _)| !available_utxo_hashs.contains(&key))
-                .collect();
+            // let available_utxo_hashs: Vec<(H256, u32)> = available_utxos
+            //     .iter()
+            //     .map(|x| (x.0.hash(), x.1) )
+            //     .collect();
+            // let delete_used_utxo: HashMap<(H256, u32), bool> = self.used_utxo
+            //     .clone()
+            //     .into_iter()
+            //     .filter(|(key, _)| !available_utxo_hashs.contains(&key))
+            //     .collect();
+
              //not all comming state is related to the same user
             //for (key, _) in delete_used_utxo.iter() {
             //    self.used_utxo.remove(key);

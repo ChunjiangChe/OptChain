@@ -38,7 +38,7 @@ impl Mempool {
         self.tx_blk_queue.len()
     }
     
-    pub fn get_tx_blocks(&self, num: usize) -> Result<Vec<TransactionBlock>, Vec<TransactionBlock>> {
+    pub fn get_tx_blocks(&self, _num: usize) -> Result<Vec<TransactionBlock>, Vec<TransactionBlock>> {
         //to be completed
         Err(vec![])
     }
@@ -49,7 +49,7 @@ impl Mempool {
             //block already exists.
             false
         } else {
-            self.tx_blk_map.insert(hash.clone(), tx_blk.clone());
+            self.tx_blk_map.insert(hash.clone(), tx_blk.clone()).unwrap();
             self.tx_blk_queue.push_back(hash);
             true
         }

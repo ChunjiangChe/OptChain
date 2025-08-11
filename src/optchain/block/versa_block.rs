@@ -56,7 +56,7 @@ impl VersaBlock {
 
     pub fn get_shard_id(&self) -> Option<usize> {
         match self {
-            VersaBlock::PropBlock(prop_block) => None,
+            VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_shard_id()),
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_shard_id()),
         }
@@ -65,14 +65,14 @@ impl VersaBlock {
     pub fn get_prop_parent(&self) -> Option<H256> {
         match self {
             VersaBlock::PropBlock(prop_block) => Some(prop_block.get_prop_parent()),
-            VersaBlock::ExAvaiBlock(avai_block) => None,
-            VersaBlock::InAvaiBlock(avai_block) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
+            VersaBlock::InAvaiBlock(_) => None,
         }
     }
 
     pub fn get_inter_parent(&self) -> Option<H256> {
         match self {
-            VersaBlock::PropBlock(prop_block) => None,
+            VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_inter_parent()),
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_inter_parent()),
         }
@@ -80,8 +80,8 @@ impl VersaBlock {
 
     pub fn get_global_parents(&self) -> Option<Vec<(H256, usize)>> {
         match self {
-            VersaBlock::PropBlock(prop_block) => None,
-            VersaBlock::ExAvaiBlock(avai_block) => None,
+            VersaBlock::PropBlock(_) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_global_parents()),
         }
     }
@@ -89,14 +89,14 @@ impl VersaBlock {
     pub fn get_prop_root(&self) -> Option<H256> {
         match self {
             VersaBlock::PropBlock(prop_block) => Some(prop_block.get_prop_root()),
-            VersaBlock::ExAvaiBlock(avai_block) => None,
-            VersaBlock::InAvaiBlock(avai_block) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
+            VersaBlock::InAvaiBlock(_) => None,
         }
     }
 
     pub fn get_avai_root(&self) -> Option<H256> {
         match self {
-            VersaBlock::PropBlock(prop_block) => None,
+            VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_avai_root()),
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_avai_root()),
         }
@@ -104,9 +104,9 @@ impl VersaBlock {
 
     pub fn get_cmt_root(&self) -> Option<H256> {
         match self {
-            VersaBlock::PropBlock(prop_block) => None,
-            VersaBlock::ExAvaiBlock(avai_block) => None,
-            VersaBlock::InAvaiBlock(avai_block) => None,
+            VersaBlock::PropBlock(_) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
+            VersaBlock::InAvaiBlock(_) => None,
         }
     }
 

@@ -177,7 +177,8 @@ impl Context {
         )        
     }
 
-    fn PoW(&self, con_block: &mut ConsensusBlock, nonce: usize) -> H256 {
+    
+    fn po_w(&self, con_block: &mut ConsensusBlock, nonce: usize) -> H256 {
         con_block.set_nonce(nonce);
         con_block.hash()
     }
@@ -417,7 +418,7 @@ impl Context {
                                 )
                                 {
                                     Ok(_) => {} 
-                                    Err(fp) => {
+                                    Err(_) => {
                                         err_types.push(String::from("invalid state"));
                                         invalid_txs.push(tx);
                                         if let Some(tmy) = possible_tmy {
@@ -488,7 +489,7 @@ impl Context {
 //                        continue;
                         
                         //if the txs are not enough, create some empty txs to fill the block
-                        for i in 0..self.config.block_size-counter {
+                        for _ in 0..self.config.block_size-counter {
                             let empty_tx = Transaction::create_empty_tx(self.config.user_size, self.config.num_tx_recv);
                             txs.push(empty_tx);
                         }
@@ -522,7 +523,7 @@ impl Context {
                 }
                 
                 let nonce: usize = rand::thread_rng().gen();
-                let hash_val = self.PoW(&mut pre_cons_block, nonce);
+                let hash_val = self.po_w(&mut pre_cons_block, nonce);
                 //info!("block hash: {:?}", hash_val);
                 let ex_diff = self.config.difficulty;
                 let in_diff = self.config.thredshold;
@@ -531,7 +532,8 @@ impl Context {
                 //supposed_global_parents.retain(|x| x.1 != self.config.shard_id );
                 //supposed_global_parents.push((vec![last_blk_hash.clone()], self.config.shard_id));
                 if hash_val <= ex_diff {
-                    let mut final_block: VersaBlock = VersaBlock::default();
+                    // let mut final_block: VersaBlock = VersaBlock::default();
+                    let final_block: VersaBlock;
                     if hash_val > in_diff {
                         //generate an exclusive block
                         info!("mine an exclusive block {:?} in shard {}", hash_val, self.config.shard_id);

@@ -85,7 +85,8 @@ impl Worker {
                     let indexs: Vec<usize> = (0..self.config.block_size).collect();
                     self.symbolpool.lock()
                                    .unwrap()
-                                   .request_symbols(&cmt_root, indexs.clone());
+                                   .request_symbols(&cmt_root, indexs.clone())
+                                   .unwrap();
                     //insert all symbols to the symbolpool
                     for index in indexs {
                         let tx = content.get_txs_ref().get(index).unwrap();

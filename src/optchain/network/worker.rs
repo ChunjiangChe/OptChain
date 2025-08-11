@@ -198,7 +198,7 @@ impl Worker {
                         }
                     }
                 }
-                _ => unimplemented!()
+                // _ => unimplemented!()
             }
         }
     }
@@ -255,7 +255,7 @@ impl Worker {
         for blk in tx_blks.iter() {
             //find tx in mempool
             let hash = blk.hash();
-            if let Some(tx_blk) = self.mempool.lock().unwrap().get_tx_blk(&hash) {
+            if let Some(_) = self.mempool.lock().unwrap().get_tx_blk(&hash) {
                 continue;
             }
             //2.find tx in the longest proposer chain
@@ -510,7 +510,7 @@ impl Worker {
 
                 match self.validator.validate_block(&block) {
                     Ok(_) => {}
-                    Err(s) => {
+                    Err(_) => {
                         info!("block insertion failure: the verification fails");
                         continue;
                     }
@@ -526,7 +526,7 @@ impl Worker {
                         &parent_hash,
                         inserted_shard_id
                     ) {
-                        Ok(y) => {
+                        Ok(_) => {
                             let new_hash = match inserted_blk.clone() {
                                 VersaBlock::PropBlock(_) 
                                     => VersaHash::PropHash(inserted_blk.hash()),
@@ -535,6 +535,7 @@ impl Worker {
                                 VersaBlock::InAvaiBlock(_)
                                     => VersaHash::InHash(inserted_blk.hash()),
                             };
+                            new_hashs.push(new_hash.clone());
                             // info!("successfully inserting block: {:?}", new_hash);
                             
 
@@ -637,7 +638,8 @@ impl Worker {
             {
                 self.symbolpool.lock()
                                .unwrap()
-                               .insert_symbol(symbol);
+                               .insert_symbol(symbol)
+                               .unwrap();
                 new_symbols.push(symbol_index);
             }
         }

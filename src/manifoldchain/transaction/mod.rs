@@ -251,11 +251,11 @@ impl Transaction {
     pub fn create_empty_tx(num_input: usize, num_output: usize) -> Transaction {
         let inputs: Vec<UtxoInput> = (0..num_input)
             .into_iter()
-            .map(|i| UtxoInput::default())
+            .map(|_| UtxoInput::default())
             .collect();
         let outputs: Vec<UtxoOutput> = (0..num_output)
             .into_iter()
-            .map(|i| UtxoOutput::default())
+            .map(|_| UtxoOutput::default())
             .collect();
         Transaction {
             inputs,

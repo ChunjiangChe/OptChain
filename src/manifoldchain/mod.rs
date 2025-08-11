@@ -251,7 +251,7 @@ pub fn start() {
     config.block_size = block_size as usize;
     config.k = confirmation_depth as usize;
     config.domestic_tx_ratio = domestic_ratio as f64;
-    let shard_id = format!("{:x}", shard_id);
+    // let shard_id = format!("{:x}", shard_id);
     info!("configuration: {:?}", config);
 
     let api_port: u16 = api_addr.port();

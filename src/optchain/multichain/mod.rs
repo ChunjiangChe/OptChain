@@ -158,23 +158,23 @@ impl Multichain {
     }
 
 
-    pub fn get_avai_tx_blocks(&self, num: usize) -> Result<Vec<TransactionBlock>, Vec<TransactionBlock>> {
+    pub fn get_avai_tx_blocks(&self, _num: usize) -> Result<Vec<TransactionBlock>, Vec<TransactionBlock>> {
         //to be completed
         Err(vec![])
     }
-    pub fn get_block_by_shard(&self, hash: &H256, shard_id: usize) -> Option<VersaBlock> {
+    pub fn get_block_by_shard(&self, _hash: &H256, _shard_id: usize) -> Option<VersaBlock> {
         //to be completed
         None
     }
-    pub fn get_prop_block(&self, hash: &H256) -> Option<ProposerBlock> {
+    pub fn get_prop_block(&self, _hash: &H256) -> Option<ProposerBlock> {
         //to be completed
         None
     }
-    pub fn get_avai_block_by_shard(&self, hash: &H256, shard_id: usize) -> Option<AvailabilityBlock> {
+    pub fn get_avai_block_by_shard(&self, _hash: &H256, _shard_id: usize) -> Option<AvailabilityBlock> {
         //to be completed
         None
     }
-    pub fn verify_availability(&self, tx_blk: &TransactionBlock) -> Result<bool, String> {
+    pub fn verify_availability(&self, _tx_blk: &TransactionBlock) -> Result<bool, String> {
         //to be completed
         Ok(true)
     }

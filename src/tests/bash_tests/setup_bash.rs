@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use std::{
     fs::{File, self},
     io::{Write, Error},
@@ -6,10 +7,15 @@ use std::{
 };
 use serde::{Serialize, Deserialize};
 
+#[allow(dead_code)]
 const EXPER_NUMBER: usize = 28;
+#[allow(dead_code)]
 const SHARD_NUM: usize = 5;
+#[allow(dead_code)]
 const SHARD_SIZE: usize = 5;
+#[allow(dead_code)]
 const PROPAGATION_DELAY: usize = 100;//ms
+#[allow(dead_code)]
 const INCLUSIVE_DIFF: usize = 15;
 
 #[test]
@@ -18,6 +24,7 @@ fn test_decode() {
     let res = decode_hex(diff.as_str()).unwrap();
     println!("{:?}", res);
 }
+#[test]
 pub fn decode_hex(s: &str) -> Result<Vec<u8>, ParseIntError> {
     (0..s.len())
         .step_by(2)
@@ -55,7 +62,7 @@ pub struct ConfigData {
     description: String, //the README of this experiment
 }
 
-
+#[test]
 fn read_config(exper_number: usize) -> ConfigData {
     let path = format!("./scripts/expers/exper_{}/config.json", exper_number);
     let config_content = fs::read_to_string(path).expect("Couldn't find the file");
@@ -63,6 +70,7 @@ fn read_config(exper_number: usize) -> ConfigData {
     config_data
 }
 
+#[test]
 fn generate_exper_bash(exper_number: usize, config: &ConfigData) -> Result<(), Error> {
     let basic_path = format!("./scripts/expers/exper_{}/", exper_number);
     let nodes_path = format!("{}nodes/", basic_path.clone());
@@ -160,6 +168,7 @@ fn generate_exper_bash(exper_number: usize, config: &ConfigData) -> Result<(), E
     Ok(())
 }
 
+#[test]
 fn generate_start_bash(exper_number: usize, config: &ConfigData) {
     let content = format!(
 "#!/bin/bash
@@ -219,6 +228,7 @@ sleep 10",
     write!(output, "{}", content).unwrap();
 }
 
+#[test]
 fn generate_start_nodes_bash(exper_number: usize, config: &ConfigData) {
     let mut network_node_cmds: Vec<String> = vec![];
     for i in 0..config.shard_num {
@@ -257,6 +267,7 @@ done",
     write!(output, "{}", cmd).unwrap();
 }
 
+#[test]
 fn generate_end_bash(exper_number: usize, config: &ConfigData) {
     let content = format!(
 "#!/bin/bash

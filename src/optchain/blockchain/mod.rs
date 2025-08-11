@@ -160,22 +160,22 @@ impl Node {
         }
     }
 
-    fn get_longest_chain_hash(root: &Box<Node>) -> (H256, usize) {
-        if root.children.is_empty() {
-            (root.val.clone(), root.height)
-        } else {
-            let mut longest_height = root.height;
-            let mut longest_hash = root.val.clone();
-            for child in root.children.iter() {
-                let (sub_hash, sub_height) = Self::get_longest_chain_hash(child);
-                if sub_height > longest_height {
-                    longest_height = sub_height;
-                    longest_hash = sub_hash;
-                }
-            }
-            (longest_hash, longest_height)
-        }
-    }
+    // fn get_longest_chain_hash(root: &Box<Node>) -> (H256, usize) {
+    //     if root.children.is_empty() {
+    //         (root.val.clone(), root.height)
+    //     } else {
+    //         let mut longest_height = root.height;
+    //         let mut longest_hash = root.val.clone();
+    //         for child in root.children.iter() {
+    //             let (sub_hash, sub_height) = Self::get_longest_chain_hash(child);
+    //             if sub_height > longest_height {
+    //                 longest_height = sub_height;
+    //                 longest_hash = sub_hash;
+    //             }
+    //         }
+    //         (longest_hash, longest_height)
+    //     }
+    // }
 
 
     pub fn get_path(root: &Box<Node>, hash: &H256) -> Option<Vec<H256>> {
@@ -270,7 +270,7 @@ impl Blockchain {
         //let mut hash2blk: HashMap<H256, VersaBlock> = HashMap::new();
         let mut hash2blk: Database<VersaBlock> = 
           Database::<VersaBlock>::new(format!("{:?}/blockchain/hash2blk", now));
-        hash2blk.insert(genesis_hash.clone(), genesis_block.clone());
+        hash2blk.insert(genesis_hash.clone(), genesis_block.clone()).unwrap();
         let root = Box::new(Node {
             val: genesis_hash.clone(),
             children: Vec::new(),
@@ -279,7 +279,7 @@ impl Blockchain {
         });
         let longest_chain_hash = genesis_hash.clone();
         let height = 0 as usize;
-        let verified_height = 0 as usize;
+        // let verified_height = 0 as usize;
         let mut hash2node: HashMap<H256, Node> = HashMap::new();
         hash2node.insert(genesis_hash.clone(), (*root).clone());
 
@@ -295,11 +295,11 @@ impl Blockchain {
         }
     }
     
-    fn delete_block(&mut self, hash: &H256) {
-        self.hash2blk.remove(hash);
-        self.hash2node.remove(hash);
-        //self.tx_map.retain(|_, val| *hash != val.0);
-    }
+    // fn delete_block(&mut self, hash: &H256) {
+    //     self.hash2blk.remove(hash);
+    //     self.hash2node.remove(hash);
+    //     //self.tx_map.retain(|_, val| *hash != val.0);
+    // }
 
     
 
@@ -317,7 +317,7 @@ impl Blockchain {
             VersaBlock::InAvaiBlock(avai_block) => avai_block
                 .get_global_parents()
                 .iter()
-                .map(|(parent_hash, shard_id)| parent_hash.clone())
+                .map(|(parent_hash, _)| parent_hash.clone())
                 .collect(),
         };
         //check whether the valid parent set contains the given parent
@@ -348,7 +348,7 @@ impl Blockchain {
         self.hash2blk.insert(
             blk_hash.clone(),
             block.clone()
-        );
+        ).unwrap();
 
         //update the longest chain information
         if new_node.height > self.height {
@@ -440,7 +440,7 @@ impl Blockchain {
         }
     }
 
-    pub fn get_tx_blk_in_longest_chain(&self, blk_hash: &H256) -> Option<TransactionBlock> {
+    pub fn get_tx_blk_in_longest_chain(&self, _blk_hash: &H256) -> Option<TransactionBlock> {
         //to be completed
         None
     }

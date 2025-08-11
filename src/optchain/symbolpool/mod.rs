@@ -118,7 +118,7 @@ impl SymbolPool {
     pub fn new (config: &Configuration) -> Self {
         let now = SystemTime::now();
         //let mut hash2blk: HashMap<H256, VersaBlock> = HashMap::new();
-        let mut hash2symbol: Database::<Symbol> = 
+        let hash2symbol: Database::<Symbol> = 
           Database::<Symbol>::new(format!("{:?}/symbolpool/hash2symbol", now));
         Self {
             hash2symbol,
@@ -204,7 +204,7 @@ impl SymbolPool {
                         return Err(String::from("Symbol already existis"));
                     }
                     None => {
-                        self.hash2symbol.insert(symbol_hash, sym);
+                        self.hash2symbol.insert(symbol_hash, sym).unwrap();
                         return Ok(true);
                     }
                 }

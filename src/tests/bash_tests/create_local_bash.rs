@@ -1,17 +1,25 @@
-use std::fs::File;
-use std::io::{Write, Error};
+#[allow(unused_imports)]
+use std::{
+    fs::File,
+    io::{Write, Error},
+};
 
+#[allow(dead_code)]
 const EXPER_NUMBER: usize = 26;
+#[allow(dead_code)]
 const SHARD_NUM: usize = 5;
+#[allow(dead_code)]
 const SHARD_SIZE: usize = 5;
+#[allow(dead_code)]
 const PROPAGATION_DELAY: usize = 100;//ms
+#[allow(dead_code)]
 const INCLUSIVE_DIFF: usize = 10;
 
 #[test]
 fn create_local_bash() {
     generate_local_bash().unwrap();
 }
-
+#[test]
 fn generate_local_bash() -> Result<(), Error> {
     let basic_path = format!("./scripts/exper_{}/", EXPER_NUMBER);
     let back_to_root = String::from("#!/bin/bash\ncd ../..\n");

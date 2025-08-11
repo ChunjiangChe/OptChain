@@ -270,10 +270,10 @@ pub fn start() {
     config.exper_number = exper_number as usize;
     config.shard_num = shard_num as usize;
     config.shard_size = shard_size as usize;
-    let shard_id = format!("{:x}", shard_id);
+    // let shard_id = format!("{:x}", shard_id);
     info!("configuration: {:?}", config);
 
-    let api_port: u16 = api_addr.port();
+    // let api_port: u16 = api_addr.port();
     let prop_chain: Arc<Mutex<Blockchain>> = Arc::new(
         Mutex::new(
             Blockchain::new(&config)
@@ -281,7 +281,7 @@ pub fn start() {
     );
     let avai_chains: Vec<Arc<Mutex<Blockchain>>> = (0..config.shard_num)
         .into_iter()
-        .map(|i| {
+        .map(|_| {
             let blockchain = Blockchain::new(&config);
             Arc::new(Mutex::new(blockchain))
         })

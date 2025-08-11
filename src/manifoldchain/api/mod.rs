@@ -349,7 +349,8 @@ impl Server {
         let states = multichain.get_states();
         let state = states.get(&longest_verified_block).unwrap();
         for item in state.iter() {
-            let tx_hash = &item.0.0;
+            // let tx_hash = &item.0.0;
+            let _ = &item.0.0;
             let tx_index = item.0.1 as usize;
             let tx = &item.1.0;
             let possbile_tmy = item.1.1.clone();

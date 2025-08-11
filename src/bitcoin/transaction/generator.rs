@@ -123,6 +123,7 @@ impl Context {
         info!("Generator initialized into pause mode");
     }
 
+    #[allow(noop_method_call)]
     fn generator_loop(&mut self) {
         //generate the initial balance for each user
         let mut initial_txs: Vec<Transaction> = Vec::new();

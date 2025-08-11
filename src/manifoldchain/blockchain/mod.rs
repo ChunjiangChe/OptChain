@@ -380,17 +380,17 @@ impl Node {
 impl Blockchain {
     /// Create a new blockchain, only containing the genesis block
     pub fn new(config: &Configuration, shard_id: usize) -> Self {
-        //create genesis block
-        let (ex_blk, tx_blk) = ExclusiveBlock::generate(
-            H256::default(), //verified_parent
-            shard_id, //shard_id
-            0, //nonce
-            H256::default(), //difficulty
-            vec![], //txs
-            vec![], //tmys
-            vec![], //inter_parents
-            vec![], //global_parents
-        );
+        // //create genesis block
+        // let (ex_blk, tx_blk) = ExclusiveBlock::generate(
+        //     H256::default(), //verified_parent
+        //     shard_id, //shard_id
+        //     0, //nonce
+        //     H256::default(), //difficulty
+        //     vec![], //txs
+        //     vec![], //tmys
+        //     vec![], //inter_parents
+        //     vec![], //global_parents
+        // );
 
         let mut cons_blk = ConsensusBlock::default();
         cons_blk.set_shard_id(shard_id);
@@ -1121,7 +1121,7 @@ impl Blockchain {
                         => Some(ex_full_block.ex_block.get_cons_block()),
                     VersaBlock::InFullBlock(in_full_block) 
                         => Some(in_full_block.in_block.get_cons_block()),
-                    _ => None
+                    // _ => None
                 }
             }
             None => None
@@ -1216,7 +1216,7 @@ impl Blockchain {
                 //remove from unverified_blocks
                 //let shard_id = self.hash2blk.get(&block_hash).unwrap().get_shard_id();
                 //self.unverified_blocks.remove(&(block_hash.clone(), shard_id));
-                self.unverified_blocks.retain(|key, value| {
+                self.unverified_blocks.retain(|key, _| {
                     block_hash != &key.0 
                 });
                 //update the longest verified chain hash 
@@ -1234,7 +1234,7 @@ impl Blockchain {
                     };
                     let confirmed_hash = history[confirmed_index];
                     let confirmed_block = self.get_block(&confirmed_hash).unwrap();
-                    let block = self.get_block(&block_hash).unwrap();
+                    let _ = self.get_block(&block_hash).unwrap();
                     
                     possible_confirmed_block = Some((confirmed_block, confirmed_index));
                 }
@@ -1280,6 +1280,7 @@ impl Blockchain {
         txs
     }
 
+    #[allow(unused_must_use)]
     pub fn log_to_file(&self) -> Result<(), Error> {
         let main_chain_blocks = self.all_blocks_in_longest_chain();
         let main_chain_block_num = main_chain_blocks.len() as f64;

@@ -161,7 +161,7 @@ impl Mempool {
                 }
                 let union_units: Vec<TestimonyUnit> = tmy_units_set
                     .into_iter()
-                    .map(|(key, val)| key.clone())
+                    .map(|(key, _)| key.clone())
                     .collect();
                 Testimony::create(
                     tx_hash.clone(),

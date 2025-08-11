@@ -52,7 +52,7 @@ impl Hashable for BlockHeader {
         let info_hash: H256 = H256::multi_hash(&info_vec);
         let global_parents_vec: Vec<H256> = self.global_parents
                                              .iter()
-                                             .map(|(hash, shard_id)| hash.clone())
+                                             .map(|(hash, _)| hash.clone())
                                              .collect();
         let global_hash: H256 = H256::multi_hash(&global_parents_vec);
         let all_hashes: Vec<H256> = vec![

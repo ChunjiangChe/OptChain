@@ -28,9 +28,9 @@ use crate::{
         },
         multichain::Multichain,
         transaction::{Transaction},
-        validator::{
-            Validator,
-        },
+        // validator::{
+        //     Validator,
+        // },
         configuration::Configuration,
         mempool::Mempool,
     },
@@ -56,7 +56,7 @@ pub struct Context {
     finished_block_chan: Sender<MinerMessage>,
     multichain: Multichain,
     mempool: Arc<Mutex<Mempool>>,
-    validator: Validator,
+    // validator: Validator,
     config: Configuration,
 }
 
@@ -73,7 +73,7 @@ pub fn new(multichain: &Multichain,
     let (signal_chan_sender, signal_chan_receiver) = unbounded();
     let (finished_block_sender, finished_block_receiver) = unbounded();
 
-    let validator = Validator::new(multichain, mempool, config);
+    // let validator = Validator::new(multichain, mempool, config);
 
     let ctx = Context {
         control_chan: signal_chan_receiver,
@@ -81,7 +81,7 @@ pub fn new(multichain: &Multichain,
         finished_block_chan: finished_block_sender,
         multichain: multichain.clone(),
         mempool: Arc::clone(mempool),
-        validator,
+        // validator,
         config: config.clone()
     };
 
@@ -130,22 +130,22 @@ impl Context {
         info!("Miner initialized into paused mode");
     }
 
-    fn PoW(&self, block_hash: H256, nonce: usize) -> H256 {
+    fn po_w(&self, block_hash: H256, nonce: usize) -> H256 {
         H256::pow_hash(&block_hash, nonce as u32)
     }
 
 
     fn miner_loop(&mut self) {
         // main mining loop
+        let mut pre_prop_parent = H256::default();
+        let mut pre_inter_parent = H256::default();
+        let mut pre_global_parents = H256::default();
+        let mut pre_hybrid_block = Block::default();
         loop {
             // check and react to control signals
             // store the hash of parents in the previous round, 
             // if the parents does not change, just need to change the nonce
             // if the parents change, repackage the txs and generate the new consensus block
-            let mut pre_prop_parent = H256::default();
-            let mut pre_inter_parent = H256::default();
-            let mut pre_global_parents = H256::default();
-            let mut pre_hybrid_block = Block::default();
             match self.operating_state {
                 OperatingState::Paused => {
                     let signal = self.control_chan.recv().unwrap();
@@ -202,10 +202,11 @@ impl Context {
                 let global_parents = self.multichain.get_all_highest_avai_blocks();
                 let global_parents_hash = H256::multi_hash(&(
                     global_parents.iter()
-                                  .map(|(hash, index)| hash.clone())
+                                  .map(|(hash, _)| hash.clone())
                                   .collect()
                 ));
-                let mut txs: Vec<Transaction> = vec![];
+                // let mut txs: Vec<Transaction> = vec![];
+                let txs: Vec<Transaction>;
                 //check if parents have been change
                 if prop_parent != pre_prop_parent ||
                     inter_parent != pre_inter_parent ||
@@ -214,7 +215,7 @@ impl Context {
                     // randomly generate a constant number of transactions
                     txs = (0..self.config.block_size)
                                 .into_iter()
-                                .map(|i| Transaction::gen_rand_tx())
+                                .map(|_| Transaction::gen_rand_tx())
                                 .collect();
 
                     let prop_tx_set = match self.mempool
@@ -254,7 +255,7 @@ impl Context {
                 }
                 
                 let nonce: usize = rand::thread_rng().gen();
-                let hash_val = self.PoW(pre_hybrid_block.hash(), nonce);
+                let hash_val = self.po_w(pre_hybrid_block.hash(), nonce);
                 //info!("block hash: {:?}", hash_val);
                 let tx_diff = self.config.tx_diff;
                 // let mut supposed_global_parents = global_parents.clone();

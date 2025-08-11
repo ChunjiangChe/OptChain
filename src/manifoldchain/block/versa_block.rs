@@ -176,9 +176,9 @@ impl VersaBlock {
 
     pub fn get_global_parents(&self) -> Option<Vec<(Vec<H256>, usize)>> {
         match self {
-            VersaBlock::ExBlock(ex_block) => None,
+            VersaBlock::ExBlock(_) => None,
             VersaBlock::InBlock(in_block) => Some(in_block.get_global_parents()),
-            VersaBlock::ExFullBlock(ex_full_block) => None,
+            VersaBlock::ExFullBlock(_) => None,
             VersaBlock::InFullBlock(in_full_block) => Some(in_full_block.get_global_parents()),
         }
     }

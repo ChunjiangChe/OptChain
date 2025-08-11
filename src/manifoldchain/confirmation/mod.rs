@@ -8,8 +8,7 @@ use crate::{
     }, 
     manifoldchain::{
         block::{
-            Info,
-            Content,
+            // Content,
             versa_block::{
                 VersaBlock,
             }

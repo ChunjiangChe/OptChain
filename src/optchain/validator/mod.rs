@@ -12,10 +12,10 @@ use crate::{
         //     Symbol,
         // },
     },
-    types::{
-        hash::{Hashable},
-        // merkle::MerkleTree,
-    },
+    // types::{
+    //     hash::{Hashable},
+    //     // merkle::MerkleTree,
+    // },
 };
 use std::{
     sync::{Arc, Mutex},
@@ -66,7 +66,7 @@ impl Validator {
 
     pub fn validate_block(&self, block: &VersaBlock) -> Result<bool, String> {
         //check whether the PoW is valid
-        let blk_hash = block.hash();
+        // let blk_hash = block.hash();
         
         //check the hash value is corrent
         if !block.verify_hash() {

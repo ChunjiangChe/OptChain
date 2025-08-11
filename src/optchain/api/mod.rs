@@ -8,9 +8,9 @@ use crate::{
             message::Message,
         },
         mempool::Mempool,
-        validator::{
-            Validator,
-        },
+        // validator::{
+        //     Validator,
+        // },
         configuration::Configuration,
     },
     // types::{
@@ -34,6 +34,7 @@ use tiny_http::{
 };
 use url::Url;
 
+#[allow(dead_code)]
 pub struct Server {
     handle: HTTPServer,
     miner: MinerHandle,
@@ -92,14 +93,14 @@ impl Server {
             for req in server.handle.incoming_requests() {
                 let miner = server.miner.clone();
                 let network = server.network.clone();
-                let multichain = server.multichain.clone();
-                let mempool = Arc::clone(&server.mempool);
-                let config = server.config.clone();
-                let validator = Validator::new(
-                    &multichain,
-                    &mempool,
-                    &config,
-                );
+                // let multichain = server.multichain.clone();
+                // let mempool = Arc::clone(&server.mempool);
+                // let config = server.config.clone();
+                // let validator = Validator::new(
+                //     &multichain,
+                //     &mempool,
+                //     &config,
+                // );
                 thread::spawn(move || {
                     // a valid url requires a base
                     let base_url = Url::parse(&format!("http://{}/", &addr)).unwrap();
