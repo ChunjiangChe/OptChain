@@ -43,6 +43,7 @@ where T: Hashable + Clone,
     /// Returns the Merkle Proof of data at index i
     pub fn proof(&self, index: usize) -> Vec<H256> {
         let size: usize = self.data.len();
+        assert!(index < size, "index ({}) must be smaller than leaf size ({})", index, size);
         let hash_vec: Vec<H256> = (0..size).map(|i| self.data[i].hash()).collect();
         Self::recursive_proof(&hash_vec, index, (0, hash_vec.len()))
     }
@@ -164,6 +165,20 @@ where T: Hashable + Clone,
         assert!(index < leaf_size);
         let generated_hash: H256 = Self::recursive_verify(proof, index, (0, leaf_size), (0, proof.len()));
         let con1: bool = generated_hash == *root;
+        let proof_index: usize = Self::get_proof_index(index, (0, leaf_size));
+        let con2: bool =  proof[proof_index] == *datum;
+        con1 && con2
+    }
+
+    pub fn merkle_prove(&self, 
+        datum: &H256, 
+        proof: &[H256], 
+        index: usize) -> bool 
+    {
+        let leaf_size: usize = self.data.len();   
+        assert!(index < leaf_size);
+        let generated_hash: H256 = Self::recursive_verify(proof, index, (0, leaf_size), (0, proof.len()));
+        let con1: bool = generated_hash == self.root;
         let proof_index: usize = Self::get_proof_index(index, (0, leaf_size));
         let con2: bool =  proof[proof_index] == *datum;
         con1 && con2

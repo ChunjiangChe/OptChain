@@ -7,7 +7,8 @@ use serde::{Serialize, Deserialize};
 use crate::{
     types::{
         hash::{H256, Hashable}, 
-        merkle::MerkleTree
+        merkle::MerkleTree,
+        random::Random,
     },
     optchain::{
         transaction::Transaction,
@@ -15,6 +16,17 @@ use crate::{
     },
 };
 use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use rand::Rng;
+
+/*
+------------
+------------
+------------
+Block definition
+------------
+------------
+------------
+*/
 
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, Hash, PartialEq)]
 pub struct BlockHeader {
@@ -44,6 +56,64 @@ pub struct Block {
     content: BlockContent,
     hash: H256,
 }
+
+pub trait Content {
+    fn get_prop_tx_set(&self) -> Vec<TransactionBlock>;
+    fn get_prop_tx_set_ref(&self) -> &Vec<TransactionBlock>;
+
+    fn get_avai_tx_set(&self) -> Vec<TransactionBlock>;
+    fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock>;
+
+    fn get_txs(&self) -> Vec<Transaction>;
+    fn get_txs_ref(&self) -> &Vec<Transaction>;
+}
+
+pub trait Info {
+    fn get_shard_id(&self) -> usize;
+    fn get_prop_parent(&self) -> H256;
+    fn get_inter_parent(&self) -> H256;
+    fn get_global_parents(&self) -> Vec<(H256, usize)>;
+    fn get_prop_root(&self) -> H256;
+    fn get_avai_root(&self) -> H256;
+    fn get_cmt_root(&self) -> H256;
+    fn get_timestamp(&self) -> SystemTime;
+    fn get_info_hash(&self) -> Vec<H256>;
+}
+
+
+/*
+------------
+------------
+------------
+Block Header
+------------
+------------
+------------
+*/
+
+impl Random for BlockHeader {
+    fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let shard_id: u32 = rng.gen();
+        let prop_parent = H256::random();
+        let inter_parent = H256::random();
+        let global_parents = vec![(prop_parent.clone(), shard_id)];
+        let prop_root = H256::random();
+        let avai_root = H256::random();
+        let cmt_root = H256::random();
+        BlockHeader {
+            shard_id,
+            prop_parent,
+            inter_parent,
+            global_parents,
+            prop_root,
+            avai_root,
+            cmt_root,
+            timestamp: SystemTime::now(),
+        }
+    }
+}
+
 
 
 impl Hashable for BlockHeader {
@@ -88,19 +158,6 @@ impl Default for BlockHeader {
     }
 }
 
-impl Default for BlockContent {
-    fn default() -> Self {
-        let prop_tx_set: Vec<TransactionBlock> = vec![];
-        let avai_tx_set: Vec<TransactionBlock> = vec![];
-        let txs: Vec<Transaction> = vec![];
-
-        BlockContent {
-            prop_tx_set: MerkleTree::<TransactionBlock>::new(prop_tx_set.as_slice()),
-            avai_tx_set: MerkleTree::<TransactionBlock>::new(avai_tx_set.as_slice()),
-            txs: MerkleTree::<Transaction>::new(txs.as_slice()),
-        }
-    }
-}
 
 impl BlockHeader {
     pub fn create(
@@ -121,11 +178,12 @@ impl BlockHeader {
                                 .iter()
                                 .map(|(hash, shard_id)| (hash.clone(), *shard_id as u32))
                                 .collect();
+        let shard_id: u32 = u32::try_from(shard_id).expect("Shard id does not fit in u32!");
         BlockHeader {
             // parent, 
             // nonce: nonce as u32,
             // difficulty,
-            shard_id: shard_id as u32,
+            shard_id,
             prop_parent,
             inter_parent,
             global_parents,
@@ -144,108 +202,6 @@ impl BlockHeader {
     pub fn set_shard_id(&mut self, shard_id: usize) {
         self.shard_id = shard_id as u32;
     }
-}
-
-impl Hashable for Block {
-    fn hash(&self) -> H256 {
-        self.hash.clone()
-    }
-}
-
-pub trait Content {
-    fn get_prop_tx_set(&self) -> Vec<TransactionBlock>;
-    fn get_prop_tx_set_ref(&self) -> &Vec<TransactionBlock>;
-
-    fn get_avai_tx_set(&self) -> Vec<TransactionBlock>;
-    fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock>;
-
-    fn get_txs(&self) -> Vec<Transaction>;
-    fn get_txs_ref(&self) -> &Vec<Transaction>;
-}
-
-impl Content for BlockContent {
-    fn get_prop_tx_set(&self) -> Vec<TransactionBlock> {
-        self.prop_tx_set.data.clone()
-    }
-    fn get_prop_tx_set_ref(&self) -> &Vec<TransactionBlock> {
-        &self.prop_tx_set.data
-    }
-
-    fn get_avai_tx_set(&self) -> Vec<TransactionBlock> {
-        self.avai_tx_set.data.clone()
-    }
-    fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock> {
-        &self.avai_tx_set.data
-    }
-
-
-
-    fn get_txs(&self) -> Vec<Transaction> {
-        self.txs.data.clone()
-    }
-    fn get_txs_ref(&self) -> &Vec<Transaction> {
-        &self.txs.data
-    }
-}
-
-impl BlockContent {
-    pub fn get_prop_merkle_root(&self) -> H256 {
-        self.prop_tx_set.root.clone()
-    }
-    pub fn get_prop_merkle_proof(&self, index: usize) -> Vec<H256> {
-        self.prop_tx_set.proof(index)
-    }
-
-    pub fn get_avai_merkle_root(&self) -> H256 {
-        self.avai_tx_set.root.clone()
-    }
-    pub fn get_avai_merkle_proof(&self, index: usize) -> Vec<H256> {
-        self.avai_tx_set.proof(index)
-    }
-
-
-    pub fn get_tx_merkle_root(&self) -> H256 {
-        self.txs.root.clone()
-    }
-    pub fn get_tx_merkle_proof(&self, tx_index: usize) -> Vec<H256> {
-        self.txs.proof(tx_index)
-    }
-}
-
-impl Content for Block {
-    fn get_prop_tx_set(&self) -> Vec<TransactionBlock> {
-        self.content.get_prop_tx_set()
-    }
-    fn get_prop_tx_set_ref(&self) -> &Vec<TransactionBlock> {
-        self.content.get_prop_tx_set_ref()
-    }
-
-    fn get_avai_tx_set(&self) -> Vec<TransactionBlock> {
-        self.content.get_avai_tx_set()
-    }
-    fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock> {
-        self.content.get_avai_tx_set_ref()
-    }
-
-
-    fn get_txs(&self) -> Vec<Transaction> {
-        self.content.get_txs()
-    }
-    fn get_txs_ref(&self) -> &Vec<Transaction> {
-        self.content.get_txs_ref()
-    }
-}
-
-pub trait Info {
-    fn get_shard_id(&self) -> usize;
-    fn get_prop_parent(&self) -> H256;
-    fn get_inter_parent(&self) -> H256;
-    fn get_global_parents(&self) -> Vec<(H256, usize)>;
-    fn get_prop_root(&self) -> H256;
-    fn get_avai_root(&self) -> H256;
-    fn get_cmt_root(&self) -> H256;
-    fn get_timestamp(&self) -> SystemTime;
-    fn get_info_hash(&self) -> Vec<H256>;
 }
 
 impl Info for BlockHeader {
@@ -293,6 +249,141 @@ impl Info for BlockHeader {
             shard_id_hash,
             // self.merkle_root.clone(),
         ]
+    }
+}
+
+/*
+------------
+------------
+------------
+Block Content
+------------
+------------
+------------
+*/
+
+
+impl Default for BlockContent {
+    fn default() -> Self {
+        let prop_tx_set: Vec<TransactionBlock> = vec![];
+        let avai_tx_set: Vec<TransactionBlock> = vec![];
+        let txs: Vec<Transaction> = vec![];
+
+        BlockContent {
+            prop_tx_set: MerkleTree::<TransactionBlock>::new(prop_tx_set.as_slice()),
+            avai_tx_set: MerkleTree::<TransactionBlock>::new(avai_tx_set.as_slice()),
+            txs: MerkleTree::<Transaction>::new(txs.as_slice()),
+        }
+    }
+}
+
+impl Content for BlockContent {
+    fn get_prop_tx_set(&self) -> Vec<TransactionBlock> {
+        self.prop_tx_set.data.clone()
+    }
+    fn get_prop_tx_set_ref(&self) -> &Vec<TransactionBlock> {
+        &self.prop_tx_set.data
+    }
+
+    fn get_avai_tx_set(&self) -> Vec<TransactionBlock> {
+        self.avai_tx_set.data.clone()
+    }
+    fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock> {
+        &self.avai_tx_set.data
+    }
+
+
+
+    fn get_txs(&self) -> Vec<Transaction> {
+        self.txs.data.clone()
+    }
+    fn get_txs_ref(&self) -> &Vec<Transaction> {
+        &self.txs.data
+    }
+}
+
+impl BlockContent {
+    pub fn create(
+        prop_tx_set: MerkleTree<TransactionBlock>,
+        avai_tx_set: MerkleTree<TransactionBlock>,
+        txs: MerkleTree<Transaction>
+    ) -> Self {
+        Self {
+            prop_tx_set,
+            avai_tx_set,
+            txs,
+        }
+    }
+    pub fn get_prop_merkle_root(&self) -> H256 {
+        self.prop_tx_set.root.clone()
+    }
+    pub fn get_prop_merkle_proof(&self, index: usize) -> Vec<H256> {
+        self.prop_tx_set.proof(index)
+    }
+    pub fn prop_merkle_prove(&self, datum: &H256, proof: &Vec<H256>, index: usize) ->bool {
+        self.prop_tx_set.merkle_prove(datum, proof, index)
+    }
+
+    pub fn get_avai_merkle_root(&self) -> H256 {
+        self.avai_tx_set.root.clone()
+    }
+    pub fn get_avai_merkle_proof(&self, index: usize) -> Vec<H256> {
+        self.avai_tx_set.proof(index)
+    }
+    pub fn avai_merkle_prove(&self, datum: &H256, proof: &Vec<H256>, index: usize) ->bool {
+        self.avai_tx_set.merkle_prove(datum, proof, index)
+    }
+
+    pub fn get_tx_merkle_root(&self) -> H256 {
+        self.txs.root.clone()
+    }
+    pub fn get_tx_merkle_proof(&self, tx_index: usize) -> Vec<H256> {
+        self.txs.proof(tx_index)
+    }
+    pub fn tx_merkle_prove(&self, datum: &H256, proof: &Vec<H256>, index: usize) ->bool {
+        self.txs.merkle_prove(datum, proof, index)
+    }
+}
+
+/*
+------------
+------------
+------------
+Block
+------------
+------------
+------------
+*/
+
+impl Content for Block {
+    fn get_prop_tx_set(&self) -> Vec<TransactionBlock> {
+        self.content.get_prop_tx_set()
+    }
+    fn get_prop_tx_set_ref(&self) -> &Vec<TransactionBlock> {
+        self.content.get_prop_tx_set_ref()
+    }
+
+    fn get_avai_tx_set(&self) -> Vec<TransactionBlock> {
+        self.content.get_avai_tx_set()
+    }
+    fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock> {
+        self.content.get_avai_tx_set_ref()
+    }
+
+
+    fn get_txs(&self) -> Vec<Transaction> {
+        self.content.get_txs()
+    }
+    fn get_txs_ref(&self) -> &Vec<Transaction> {
+        self.content.get_txs_ref()
+    }
+}
+
+
+
+impl Hashable for Block {
+    fn hash(&self) -> H256 {
+        self.hash.clone()
     }
 }
 

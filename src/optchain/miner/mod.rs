@@ -15,6 +15,7 @@ use std::{
 use crate::{        
     types::{
         hash::{H256, Hashable},
+        random::Random,
     }, 
     optchain::{
         block::{
@@ -215,7 +216,7 @@ impl Context {
                     // randomly generate a constant number of transactions
                     txs = (0..self.config.block_size)
                                 .into_iter()
-                                .map(|_| Transaction::gen_rand_tx())
+                                .map(|_| Transaction::random())
                                 .collect();
 
                     let prop_tx_set = match self.mempool

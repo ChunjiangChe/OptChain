@@ -2,6 +2,7 @@ use crate::{
     types::{
         hash::{H256, Hashable},
         // merkle::MerkleTree,
+        random::Random,
     },
     optchain::{
         block::{
@@ -15,12 +16,24 @@ use crate::{
 use serde::{Serialize, Deserialize};
 // use std::collections::HashMap;
 use std::time::{SystemTime};
+use rand::Rng;
 
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, Hash, PartialEq)]
 pub struct TransactionBlock {
     header: BlockHeader,
     nonce: u32,
     //txs: MerkleTree<Transaction>
+}
+
+impl Random for TransactionBlock {
+    fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let nonce: u32 = rng.gen();
+        TransactionBlock {
+            header: BlockHeader::random(),
+            nonce,
+        }
+    }
 }
 
 impl Default for TransactionBlock {
@@ -70,9 +83,10 @@ impl Info for TransactionBlock {
 
 impl TransactionBlock {
     pub fn new(header: BlockHeader, nonce: usize) -> Self {
+        let nonce: u32 = u32::try_from(nonce).expect("Nonce does not fit in u32!");
         TransactionBlock {
             header,
-            nonce: nonce as u32,
+            nonce,
         }
     }
     pub fn get_mem_size(&self) -> usize {

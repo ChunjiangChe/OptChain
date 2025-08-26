@@ -2,6 +2,7 @@ use serde::{Serialize, Deserialize};
 use ring::signature::{self, Ed25519KeyPair, Signature, KeyPair};
 use crate::types::hash::{H256, Hashable};
 use rand::{self, Rng};
+use crate::types::random::Random;
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash, PartialEq)]
 pub enum TxFlag{
     Initial,
@@ -52,6 +53,36 @@ pub struct UtxoOutput {
     pub receiver_addr: H256,
     pub value: u32,
     pub public_key_ref: Vec<u8>,
+}
+
+impl Random for Transaction {
+    fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let sender_addr: [u8; 32] = rng.gen();
+        let sender_addr_hash: H256 = (&sender_addr).into();
+        let rand_addr: [u8; 32] = rng.gen();
+        let rand_addr_hash = (&rand_addr).into();
+        let input = UtxoInput {
+            sender_addr: sender_addr_hash,
+            tx_hash: H256::default(),
+            value: 0,
+            index: 0,
+            sig_ref: Vec::new()
+        };
+        let output = UtxoOutput {
+            receiver_addr: rand_addr_hash,
+            value: 0,
+            public_key_ref: Vec::new()
+        };
+        let inputs: Vec<UtxoInput> = vec![input];
+        let outputs: Vec<UtxoOutput> = vec![output];
+
+        Transaction {
+            inputs,
+            outputs,
+            flag: TxFlag::Initial,
+        }
+    }
 }
 
 impl Hashable for UtxoInput {
@@ -140,33 +171,33 @@ impl Default for Transaction {
 
 impl Transaction {
     //generate a random transaction
-    pub fn gen_rand_tx() -> Self {
-        let mut rng = rand::thread_rng();
-        let sender_addr: [u8; 32] = rng.gen();
-        let sender_addr_hash: H256 = (&sender_addr).into();
-        let rand_addr: [u8; 32] = rng.gen();
-        let rand_addr_hash = (&rand_addr).into();
-        let input = UtxoInput {
-            sender_addr: sender_addr_hash,
-            tx_hash: H256::default(),
-            value: 0,
-            index: 0,
-            sig_ref: Vec::new()
-        };
-        let output = UtxoOutput {
-            receiver_addr: rand_addr_hash,
-            value: 0,
-            public_key_ref: Vec::new()
-        };
-        let inputs: Vec<UtxoInput> = vec![input];
-        let outputs: Vec<UtxoOutput> = vec![output];
+    // pub fn gen_rand_tx() -> Self {
+    //     let mut rng = rand::thread_rng();
+    //     let sender_addr: [u8; 32] = rng.gen();
+    //     let sender_addr_hash: H256 = (&sender_addr).into();
+    //     let rand_addr: [u8; 32] = rng.gen();
+    //     let rand_addr_hash = (&rand_addr).into();
+    //     let input = UtxoInput {
+    //         sender_addr: sender_addr_hash,
+    //         tx_hash: H256::default(),
+    //         value: 0,
+    //         index: 0,
+    //         sig_ref: Vec::new()
+    //     };
+    //     let output = UtxoOutput {
+    //         receiver_addr: rand_addr_hash,
+    //         value: 0,
+    //         public_key_ref: Vec::new()
+    //     };
+    //     let inputs: Vec<UtxoInput> = vec![input];
+    //     let outputs: Vec<UtxoOutput> = vec![output];
 
-        Transaction {
-            inputs,
-            outputs,
-            flag: TxFlag::Initial,
-        }
-    }
+    //     Transaction {
+    //         inputs,
+    //         outputs,
+    //         flag: TxFlag::Initial,
+    //     }
+    // }
     pub fn get_mem_size(&self) -> usize {
         let mut input_mem_size = 0;
         for input in self.inputs.iter() {
