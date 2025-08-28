@@ -270,7 +270,7 @@ impl Context {
                                 let in_block = VersaBlock::InAvaiBlock(AvailabilityBlock::new(    
                                     pre_hybrid_block.get_header(),
                                     nonce,
-                                    pre_hybrid_block.get_avai_tx_set(),
+                                    pre_hybrid_block.get_avai_merkle_tree(),
                                 ));
                                 self.finished_block_chan
                                     .send(MinerMessage::VersaBlk(in_block))
@@ -280,7 +280,7 @@ impl Context {
                                 let ex_block = VersaBlock::ExAvaiBlock(AvailabilityBlock::new(    
                                     pre_hybrid_block.get_header(),
                                     nonce,
-                                    pre_hybrid_block.get_avai_tx_set(),
+                                    pre_hybrid_block.get_avai_merkle_tree(),
                                 ));
                                 self.finished_block_chan
                                     .send(MinerMessage::VersaBlk(ex_block))
@@ -291,7 +291,7 @@ impl Context {
                             let prop_block = VersaBlock::PropBlock(ProposerBlock::new(    
                                 pre_hybrid_block.get_header(),
                                 nonce,
-                                pre_hybrid_block.get_prop_tx_set(),
+                                pre_hybrid_block.get_prop_merkle_tree(),
                             ));
                             self.finished_block_chan
                                 .send(MinerMessage::VersaBlk(prop_block))

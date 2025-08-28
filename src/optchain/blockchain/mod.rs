@@ -324,7 +324,7 @@ impl Blockchain {
         if !parents.contains(parent) {
             return Err(String::from("Wrong parent"));
         }
-        if let Some(_) = self.hash2blk.get(parent) {
+        if let None = self.hash2blk.get(parent) {
             return Err(String::from("Parent doesn't exisit"));
         }
          

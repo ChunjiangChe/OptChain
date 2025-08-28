@@ -71,12 +71,12 @@ impl Info for ProposerBlock {
 }
 
 impl ProposerBlock {
-    pub fn new(header: BlockHeader, nonce: usize, prop_tx_set: Vec<TransactionBlock>) -> Self {
+    pub fn new(header: BlockHeader, nonce: usize, prop_tx_set: MerkleTree<TransactionBlock>) -> Self {
         ProposerBlock {
             hash: H256::pow_hash(&header.hash(), nonce as u32),
             header,
             nonce: nonce as u32,
-            prop_tx_set: MerkleTree::<TransactionBlock>::new(prop_tx_set.as_slice()),
+            prop_tx_set,
         }
     }
 

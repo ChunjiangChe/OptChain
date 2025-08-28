@@ -71,12 +71,12 @@ impl Hashable for AvailabilityBlock {
 }
 
 impl AvailabilityBlock {
-    pub fn new(header: BlockHeader, nonce: usize, avai_tx_set: Vec<TransactionBlock>) -> Self {
+    pub fn new(header: BlockHeader, nonce: usize, avai_tx_set: MerkleTree<TransactionBlock>) -> Self {
         AvailabilityBlock {
             hash: H256::pow_hash(&header.hash(), nonce as u32),
             header,
             nonce: nonce as u32,
-            avai_tx_set: MerkleTree::<TransactionBlock>::new(avai_tx_set.as_slice()),
+            avai_tx_set,
         }
     }
 

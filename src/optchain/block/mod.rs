@@ -66,6 +66,10 @@ pub trait Content {
 
     fn get_txs(&self) -> Vec<Transaction>;
     fn get_txs_ref(&self) -> &Vec<Transaction>;
+
+    fn get_prop_merkle_tree(&self) -> MerkleTree<TransactionBlock>;
+    fn get_avai_merkle_tree(&self) -> MerkleTree<TransactionBlock>;
+    fn get_txs_merkle_tree(&self) -> MerkleTree<Transaction>;
 }
 
 pub trait Info {
@@ -300,6 +304,16 @@ impl Content for BlockContent {
     fn get_txs_ref(&self) -> &Vec<Transaction> {
         &self.txs.data
     }
+
+    fn get_prop_merkle_tree(&self) -> MerkleTree<TransactionBlock> {
+        self.prop_tx_set.clone()
+    }
+    fn get_avai_merkle_tree(&self) -> MerkleTree<TransactionBlock> {
+        self.avai_tx_set.clone()
+    }
+    fn get_txs_merkle_tree(&self) -> MerkleTree<Transaction> {
+        self.txs.clone()
+    }
 }
 
 impl BlockContent {
@@ -376,6 +390,16 @@ impl Content for Block {
     }
     fn get_txs_ref(&self) -> &Vec<Transaction> {
         self.content.get_txs_ref()
+    }
+    
+    fn get_prop_merkle_tree(&self) -> MerkleTree<TransactionBlock> {
+        self.content.get_prop_merkle_tree()
+    }
+    fn get_avai_merkle_tree(&self) -> MerkleTree<TransactionBlock> {
+        self.content.get_avai_merkle_tree()
+    }
+    fn get_txs_merkle_tree(&self) -> MerkleTree<Transaction> {
+        self.content.get_txs_merkle_tree()
     }
 }
 
