@@ -75,7 +75,7 @@ fn test_blockchain() {
         prop_tx_set_2, //prop_tx_set
     );
     let versa_block_2 = VersaBlock::PropBlock(prop_block_2);
-    blockchain.insert_block_with_parent(versa_block_2, &(versa_block.hash())).expect("insert failure");
+    blockchain.insert_block_with_parent(versa_block_2.clone(), &(versa_block.hash())).expect("insert failure");
 
     //insert a third block
     let prop_tx_set_3: Vec<TransactionBlock> = (0..10)
@@ -99,5 +99,23 @@ fn test_blockchain() {
         prop_tx_set_3, //prop_tx_set
     );
     let versa_block_3 = VersaBlock::PropBlock(prop_block_3);
-    blockchain.insert_block_with_parent(versa_block_3, &(versa_block.hash())).expect("insert failure");
+    blockchain.insert_block_with_parent(versa_block_3.clone(), &(versa_block.hash())).expect("insert failure");
+
+    //test all_blocks_in_longest_chain
+    let longest_path_hashes = blockchain.all_blocks_in_longest_chain();
+    assert_eq!(longest_path_hashes.len(), 3);
+    assert_eq!(longest_path_hashes.get(1).unwrap().clone(), versa_block.hash());
+    assert_eq!(longest_path_hashes.get(2).unwrap().clone(), versa_block_2.hash());
+
+    let r_versa_block = blockchain.get_block(&(versa_block.hash())).expect("Block does not exist.");
+    let r_versa_block_2 = blockchain.get_block(&(versa_block_2.hash())).expect("Block does not exist.");
+    let r_versa_block_3 = blockchain.get_block(&(versa_block_3.hash())).expect("Block does not exist.");
+
+    assert_eq!(r_versa_block.hash(), versa_block.hash());
+    assert_eq!(r_versa_block_2.hash(), versa_block_2.hash());
+    assert_eq!(r_versa_block_3.hash(), versa_block_3.hash());
+
+    // assert!(blockchain.is_block_in_longest_chain(&(versa_block.hash())));
+    // assert!(blockchain.is_block_in_longest_chain(&(versa_block_2.hash())));
+    // assert!(blockchain.is_block_in_longest_chain(&(versa_block_3.hash())));
 }

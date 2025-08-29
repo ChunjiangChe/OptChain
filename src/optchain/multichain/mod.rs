@@ -16,6 +16,7 @@ use crate::{
 };
 use std::{
     sync::{Arc, Mutex},
+    collections::BTreeSet,
 };
 
 
@@ -23,6 +24,7 @@ pub struct Multichain {
     pub config: Configuration,
     proposer_chain: Arc<Mutex<Blockchain>>,
     availability_chains: Vec<Arc<Mutex<Blockchain>>>,
+    new_tx_blocks: BTreeSet<TransactionBlock>, // those transaction blocks in proposer but not in availability blocks
 }
 
 impl Clone for Multichain {
@@ -36,6 +38,7 @@ impl Clone for Multichain {
             config: self.config.clone(),
             proposer_chain: Arc::clone(&self.proposer_chain),
             availability_chains: new_availability_chains,
+            new_tx_blocks: BTreeSet::new(),
         }
     }
 }
@@ -66,10 +69,15 @@ impl Multichain {
     ) -> Result<bool, String> {
         match parent.clone() {
             VersaHash::PropHash(h) => {
-                self.proposer_chain
+                match self.proposer_chain
                     .lock()
                     .unwrap()
-                    .insert_block_with_parent(block, &h)
+                    .insert_block_with_parent(block, &h) {
+                        Ok(true) => {
+
+                        }
+                        Err(e) => Err(e),
+                    }
             }
             VersaHash::ExHash(h) => {
                 self.availability_chains
@@ -157,9 +165,11 @@ impl Multichain {
         //                         .collect()
     }
 
-
+    // get num available tx_blocks(cmt_root) in the proposer chain which are not included in the longest
+    // availability chains already
     pub fn get_avai_tx_blocks(&self, _num: usize) -> Result<Vec<TransactionBlock>, Vec<TransactionBlock>> {
         //to be completed
+
         Err(vec![])
     }
     pub fn get_block_by_shard(&self, _hash: &H256, _shard_id: usize) -> Option<VersaBlock> {

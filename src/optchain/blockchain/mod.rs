@@ -31,7 +31,7 @@ pub struct Blockchain {
     //Rust does not allow two pointers to point to the same variable
     hash2node: HashMap<H256, Node>, //blk_hash -> node
     root: Box<Node>,
-    tx_map: HashMap<H256, Vec<(H256, usize)>>, //tx_hash -> (block_hash, index), one tx may exit in
+    // tx_map: HashMap<H256, Vec<(H256, usize)>>, //tx_hash -> (block_hash, index), one tx may exit in
     //multiple blocks
     pub longest_chain_hash: H256,
     pub height: usize,
@@ -288,7 +288,7 @@ impl Blockchain {
             hash2blk,
             hash2node,
             root,
-            tx_map: HashMap::new(),
+            // tx_map: HashMap::new(),
             longest_chain_hash,
             height,
             config: config.clone(),
@@ -403,32 +403,32 @@ impl Blockchain {
         } 
     }
 
-    pub fn is_block_in_longest_chain(&self, hash: &H256) -> bool {
-        match Node::get_node_by_hash(&self.root, hash) {
-            Some(node) => node.longest_height == self.height,
-            None => false
-        }
-    }
+    // pub fn is_block_in_longest_chain(&self, hash: &H256) -> bool {
+    //     match Node::get_node_by_hash(&self.root, hash) {
+    //         Some(node) => node.longest_height == self.height,
+    //         None => false
+    //     }
+    // }
 
-    pub fn get_block_with_tx(&self, tx_hash: &H256) -> Option<(VersaBlock, usize)> {
-        match self.tx_map.get(tx_hash) {
-            Some(locations) => {
-                let longest_chain_blks: Vec<H256> = self.all_blocks_in_longest_chain();
-                for location in locations.iter() {
-                    let blk_hash = &location.0;
-                    let tx_index = location.1;
-                    if longest_chain_blks.contains(blk_hash) {
-                        let blk = self.hash2blk.get(blk_hash).unwrap().clone();
-                        return Some((blk, tx_index));
-                    } else {
-                        return None;
-                    }
-                }
-                None 
-            },
-            None => None,
-        }
-    }
+    // pub fn get_block_with_tx(&self, tx_hash: &H256) -> Option<(VersaBlock, usize)> {
+    //     match self.tx_map.get(tx_hash) {
+    //         Some(locations) => {
+    //             let longest_chain_blks: Vec<H256> = self.all_blocks_in_longest_chain();
+    //             for location in locations.iter() {
+    //                 let blk_hash = &location.0;
+    //                 let tx_index = location.1;
+    //                 if longest_chain_blks.contains(blk_hash) {
+    //                     let blk = self.hash2blk.get(blk_hash).unwrap().clone();
+    //                     return Some((blk, tx_index));
+    //                 } else {
+    //                     return None;
+    //                 }
+    //             }
+    //             None 
+    //         },
+    //         None => None,
+    //     }
+    // }
 
 
     pub fn get_block_height(&self, block_hash: &H256) -> Option<usize> {
