@@ -24,7 +24,7 @@ use std::{
 // use log::{info, debug};
 
 pub struct Validator {
-    multichain: Multichain,
+    multichain: Arc<Mutex<Multichain>>,
     mempool: Arc<Mutex<Mempool>>,
     config: Configuration,
 }
@@ -32,7 +32,7 @@ pub struct Validator {
 impl Clone for Validator {
     fn clone(&self) -> Self {
         Validator {
-            multichain: self.multichain.clone(),
+            multichain: Arc::clone(&self.multichain),
             mempool: Arc::clone(&self.mempool),
             config: self.config.clone(),
         }
@@ -53,12 +53,12 @@ pub enum CrossUtxoStatus {
 
 impl Validator {
     pub fn new(
-        multichain: &Multichain,
+        multichain: &Arc<Mutex<Multichain>>,
         mempool: &Arc<Mutex<Mempool>>,
         config: &Configuration
     ) -> Self {
         Validator {
-            multichain: multichain.clone(),
+            multichain: Arc::clone(multichain),
             mempool: Arc::clone(mempool),
             config: config.clone(),
         }
@@ -78,7 +78,10 @@ impl Validator {
             VersaBlock::PropBlock(_) => return Ok(true),
             VersaBlock::ExAvaiBlock(avai_block) => {
                 for tx_blk_hash in avai_block.get_avai_tx_set().iter() {
-                    match self.multichain.verify_availability(tx_blk_hash) {
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .verify_availability(tx_blk_hash) {
                         Ok(_) => {}
                         Err(_) => {
                             return Err(String::from("some symbols are not received"));
@@ -88,7 +91,10 @@ impl Validator {
             }
             VersaBlock::InAvaiBlock(avai_block) => {
                 for tx_blk_hash in avai_block.get_avai_tx_set().iter() {
-                    match self.multichain.verify_availability(tx_blk_hash) {
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .verify_availability(tx_blk_hash) {
                         Ok(_) => {}
                         Err(_) => {
                             return Err(String::from("some symbols are not received"));

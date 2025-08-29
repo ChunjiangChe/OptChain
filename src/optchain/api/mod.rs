@@ -39,7 +39,7 @@ pub struct Server {
     handle: HTTPServer,
     miner: MinerHandle,
     network: NetworkServerHandle,
-    multichain: Multichain,
+    multichain: Arc<Mutex<Multichain>>,
     mempool: Arc<Mutex<Mempool>>,
     config: Configuration,
 }
@@ -76,7 +76,7 @@ impl Server {
         addr: std::net::SocketAddr,
         miner: &MinerHandle,
         network: &NetworkServerHandle,
-        multichain: &Multichain,
+        multichain: &Arc<Mutex<Multichain>>,
         mempool: &Arc<Mutex<Mempool>>,
         config: &Configuration,
     ) {
@@ -85,7 +85,7 @@ impl Server {
             handle,
             miner: miner.clone(),
             network: network.clone(),
-            multichain: multichain.clone(),
+            multichain: Arc::clone(multichain),
             mempool: Arc::clone(mempool),
             config: config.clone(),
         };

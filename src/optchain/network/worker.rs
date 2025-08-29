@@ -43,7 +43,7 @@ pub struct Worker {
     msg_chan: smol::channel::Receiver<(Vec<u8>, peer::Handle)>,
     num_worker: usize,
     server: ServerHandle,
-    multichain: Multichain,
+    multichain: Arc<Mutex<Multichain>>,
     blk_buff: HashMap<VersaHash, Vec<VersaBlock>>,
     mempool: Arc<Mutex<Mempool>>,
     symbolpool: Arc<Mutex<SymbolPool>>,
@@ -59,7 +59,7 @@ impl Worker {
         num_worker: usize,
         msg_src: smol::channel::Receiver<(Vec<u8>, peer::Handle)>,
         server: &ServerHandle,
-        multichain: &Multichain,
+        multichain: &Arc<Mutex<Multichain>>,
         mempool: &Arc<Mutex<Mempool>>,
         symbolpool: &Arc<Mutex<SymbolPool>>,
         config: &Configuration,
@@ -69,7 +69,7 @@ impl Worker {
             msg_chan: msg_src,
             num_worker,
             server: server.clone(),
-            multichain: multichain.clone(),
+            multichain: Arc::clone(multichain),
             blk_buff: HashMap::new(),
             mempool: Arc::clone(mempool),
             symbolpool: Arc::clone(symbolpool),
@@ -187,7 +187,10 @@ impl Worker {
                 }
                 Message::NewMissBlockHash((miss_blk_vec, shard_id)) => {
                     for blk in miss_blk_vec {
-                        match self.multichain.get_block_by_shard(
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_block_by_shard(
                             &blk,
                             shard_id as usize
                         ) {
@@ -214,6 +217,8 @@ impl Worker {
                 continue;
             }
             if let Some(_) = self.multichain
+                .lock()
+                .unwrap()
                 .get_tx_blk_in_longest_proposer_chain(tx_blk_hash) {
                 continue;
             }
@@ -237,7 +242,10 @@ impl Worker {
                 continue;
             }
             //find tx in blockchain
-            if let Some(blk) = self.multichain.get_tx_blk_in_longest_proposer_chain(tx_blk_hash) {
+            if let Some(blk) = self.multichain
+                .lock()
+                .unwrap()
+                .get_tx_blk_in_longest_proposer_chain(tx_blk_hash) {
                 res_tx_blks.push(blk);
             }
         }
@@ -259,7 +267,10 @@ impl Worker {
                 continue;
             }
             //2.find tx in the longest proposer chain
-            if let Some(_) = self.multichain.get_tx_blk_in_longest_proposer_chain(&hash){
+            if let Some(_) = self.multichain
+                .lock()
+                .unwrap()
+                .get_tx_blk_in_longest_proposer_chain(&hash){
                 continue;
             }
             // match self.validator.validate_tx(tx, None, None, ValidationSource::FromTransaction) {
@@ -290,7 +301,10 @@ impl Worker {
         for versa_hash in block_hash_vec {
             match versa_hash.clone() {
                 VersaHash::PropHash(prop_hash) => {
-                    match self.multichain.get_prop_block(
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_prop_block(
                         &prop_hash) {
                         Some(_) => {}
                         None => unreceived_blks.push(
@@ -302,7 +316,10 @@ impl Worker {
                     let mut is_found = false;
                     //not sure the shard id of the exclusive block based on its hash
                     for id in 0..self.config.shard_num {
-                        match self.multichain.get_avai_block_by_shard(
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_avai_block_by_shard(
                             &ex_hash,
                             id
                         ){
@@ -323,7 +340,10 @@ impl Worker {
                     let mut is_found = false;
                     //not sure the shard id of the exclusive block based on its hash
                     for id in 0..self.config.shard_num {
-                        match self.multichain.get_avai_block_by_shard(
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_avai_block_by_shard(
                             &in_hash,
                             id
                         ){
@@ -365,7 +385,10 @@ impl Worker {
         for versa_hash in hash_vec {
             match versa_hash {
                 VersaHash::PropHash(prop_hash) => {
-                    match self.multichain.get_prop_block(
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_prop_block(
                             &prop_hash
                     ){
                         Some(block) => res_blks.push(VersaBlock::PropBlock(block)),
@@ -374,7 +397,10 @@ impl Worker {
                 }
                 VersaHash::ExHash(ex_hash) => {
                     for id in 0..self.config.shard_num {
-                        match self.multichain.get_avai_block_by_shard(
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_avai_block_by_shard(
                             &ex_hash, 
                             id
                         ){
@@ -388,7 +414,10 @@ impl Worker {
                 }
                 VersaHash::InHash(in_hash) => {
                     for id in 0..self.config.shard_num {
-                        match self.multichain.get_avai_block_by_shard(
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_avai_block_by_shard(
                             &in_hash, 
                             id
                         ){
@@ -461,7 +490,10 @@ impl Worker {
                 let mut parent_not_exisit = false;
                 match parent_hash.clone() {
                     VersaHash::PropHash(prop_hash) => {
-                        match self.multichain.get_prop_block(&prop_hash) {
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_prop_block(&prop_hash) {
                             Some(_) => {}
                             None => {
                                 parent_not_exisit = true;
@@ -469,7 +501,10 @@ impl Worker {
                         }
                     }
                     VersaHash::ExHash(ex_hash) => {
-                        match self.multichain.get_avai_block_by_shard(&ex_hash, inserted_shard_id) {
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_avai_block_by_shard(&ex_hash, inserted_shard_id) {
                             Some(_) => {}
                             None => {
                                 parent_not_exisit = true;
@@ -477,7 +512,10 @@ impl Worker {
                         }
                     }
                     VersaHash::InHash(in_hash) => {
-                        match self.multichain.get_avai_block_by_shard(&in_hash, inserted_shard_id) {
+                        match self.multichain
+                            .lock()
+                            .unwrap()
+                            .get_avai_block_by_shard(&in_hash, inserted_shard_id) {
                             Some(_) => {}
                             None => {
                                 parent_not_exisit = true;
@@ -521,7 +559,10 @@ impl Worker {
                 let mut removed_buff: Vec<VersaHash> = vec![];
                 while !inserted_blks.is_empty() {
                     let inserted_blk = inserted_blks.pop_front().unwrap();
-                    match self.multichain.insert_block_with_parent(
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .insert_block_with_parent(
                         inserted_blk.clone(),
                         &parent_hash,
                         inserted_shard_id

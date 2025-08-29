@@ -35,7 +35,7 @@ use crate::{
 
 
 pub struct Context {
-    multichain: Multichain,
+    multichain: Arc<Mutex<Multichain>>,
     config: Configuration,
     server: ServerHandle,
     symbol_pool: Arc<Mutex<SymbolPool>>,
@@ -48,7 +48,7 @@ pub fn new(multichain: &Multichain,
     symbol_pool: &Arc<Mutex<SymbolPool>>) -> Context 
 {
     Context {
-        multichain: multichain.clone(),
+        multichain: Arc::clone(multichain),
         server: server.clone(),
         config: config.clone(),
         symbol_pool: Arc::clone(symbol_pool,)
@@ -71,7 +71,10 @@ impl Context {
     fn monitor_sample(&mut self) {
         loop {
             //check if there are any unverified blocks, if yes, request the samples
-            let prop_ref_tx_blks = self.multichain.get_all_prop_refer_tx_blks();
+            let prop_ref_tx_blks = self.multichain
+                .lock()
+                .unwrap()
+                .get_all_prop_refer_tx_blks();
             if !prop_ref_tx_blks.is_empty() {
                 let mut req_symbol_indexs: Vec<SymbolIndex> = vec![];
                 for tx_blk in prop_ref_tx_blks.iter() {

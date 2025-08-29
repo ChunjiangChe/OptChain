@@ -34,7 +34,7 @@ use std::{
 pub struct Worker {
     server: ServerHandle,
     finished_block_chan: Receiver<MinerMessage>,
-    multichain: Multichain,
+    multichain: Arc<Mutex<Multichain>>,
     mempool: Arc<Mutex<Mempool>>,
     symbolpool: Arc<Mutex<SymbolPool>>,
     config: Configuration,
@@ -44,7 +44,7 @@ impl Worker {
     pub fn new(
         server: &ServerHandle,
         finished_block_chan: Receiver<MinerMessage>,
-        multichain: &Multichain,
+        multichain: &Arc<Mutex<Multichain>>,
         mempool: &Arc<Mutex<Mempool>>,
         symbolpool: &Arc<Mutex<SymbolPool>>,
         config: &Configuration,
@@ -52,7 +52,7 @@ impl Worker {
         Self {
             server: server.clone(),
             finished_block_chan,
-            multichain: multichain.clone(),
+            multichain: Arc::clone(multichain),
             mempool: Arc::clone(mempool),
             symbolpool: Arc::clone(symbolpool),
             config: config.clone(),
@@ -110,7 +110,10 @@ impl Worker {
                         VersaBlock::InAvaiBlock(avai_block) => {
                             let global_parents = avai_block.get_global_parents();
                             for (inter_parent, shard_id) in global_parents {
-                                match self.multichain.insert_block_with_parent(
+                                match self.multichain
+                                    .lock()
+                                    .unwrap()
+                                    .insert_block_with_parent(
                                     versa_block.clone(),
                                     &VersaHash::InHash(inter_parent),
                                     shard_id
@@ -128,7 +131,10 @@ impl Worker {
                         VersaBlock::ExAvaiBlock(avai_block) => {
                             //exclusive avaialbility block
                             let inter_parent = avai_block.get_inter_parent();
-                            match self.multichain.insert_block_with_parent(
+                            match self.multichain
+                                .lock()
+                                .unwrap()
+                                .insert_block_with_parent(
                                 versa_block.clone(),
                                 &VersaHash::ExHash(inter_parent),
                                 self.config.shard_id
@@ -144,7 +150,10 @@ impl Worker {
                         }
                         VersaBlock::PropBlock(prop_block) => {
                             let prop_parent = prop_block.get_prop_parent();
-                            match self.multichain.insert_block_with_parent(
+                            match self.multichain
+                                .lock()
+                                .unwrap()
+                                .insert_block_with_parent(
                                 versa_block.clone(),
                                 &VersaHash::PropHash(prop_parent),
                                 self.config.shard_id

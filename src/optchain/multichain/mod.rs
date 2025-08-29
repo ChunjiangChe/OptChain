@@ -15,49 +15,56 @@ use crate::{
     }
 };
 use std::{
-    sync::{Arc, Mutex},
+    // sync::{Arc, Mutex},
     collections::BTreeSet,
 };
 
 
 pub struct Multichain {
     pub config: Configuration,
-    proposer_chain: Arc<Mutex<Blockchain>>,
-    availability_chains: Vec<Arc<Mutex<Blockchain>>>,
+    proposer_chain: Blockchain,
+    availability_chains: Vec<Blockchain>,
     new_tx_blocks: BTreeSet<TransactionBlock>, // those transaction blocks in proposer but not in availability blocks
 }
 
-impl Clone for Multichain {
-    fn clone(&self) -> Self {
-        let new_availability_chains: Vec<Arc<Mutex<Blockchain>>> = self.availability_chains
-            .clone()
-            .into_iter()
-            .map(|x| Arc::clone(&x))
-            .collect();
-        Multichain {
-            config: self.config.clone(),
-            proposer_chain: Arc::clone(&self.proposer_chain),
-            availability_chains: new_availability_chains,
-            new_tx_blocks: BTreeSet::new(),
-        }
-    }
-}
+// impl Clone for Multichain {
+//     fn clone(&self) -> Self {
+//         let new_availability_chains: Vec<Blockchain> = self.availability_chains
+//             .iter()
+//             .map(|x| x.clone())
+//             .collect();
+//         Multichain {
+//             config: self.config.clone(),
+//             proposer_chain: self.proposer_chain.clone(),
+//             availability_chains: new_availability_chains,
+//             new_tx_blocks: BTreeSet::new(),
+//         }
+//     }
+// }
 
 impl Multichain {
     pub fn create(
-        proposer_chain: &Arc<Mutex<Blockchain>>,
-        availability_chains: Vec<&Arc<Mutex<Blockchain>>>, 
+        proposer_chain: Blockchain,
+        availability_chains: Vec<Blockchain>, 
         config: &Configuration) -> Self 
     {
+        let shard_id = config.shard_id;
+        let prop_tx_set = proposer_chain.get_all_tx_blk_in_longest_chain_by_shard(shard_id);
+        let mut avai_tx_set = availability_chains.get(shard_id).get_all_tx_blk_in_longest_chain();
 
-        let new_availability_chains: Vec<Arc<Mutex<Blockchain>>> = availability_chains
+        //sort avai_tx_set so we can binary search it effiently
+        avai_tx_set.sort_unstable();
+
+        //Keep only elements in A that are not in B
+        let new_tx_set: Vec<TransactionBlock> = prop_tx_set
             .into_iter()
-            .map(|x| Arc::clone(x))
+            .filter(|x| avai_tx_set.binary_search(x).is_err())
             .collect();
+
         Multichain {
-            proposer_chain: Arc::clone(proposer_chain),
-            availability_chains: new_availability_chains,
-            config: config.clone()
+            proposer_chain,
+            availability_chains,
+            config: config.clone(),
         }
     }
 
@@ -70,8 +77,6 @@ impl Multichain {
         match parent.clone() {
             VersaHash::PropHash(h) => {
                 match self.proposer_chain
-                    .lock()
-                    .unwrap()
                     .insert_block_with_parent(block, &h) {
                         Ok(true) => {
 
@@ -83,15 +88,11 @@ impl Multichain {
                 self.availability_chains
                     .get(block.get_shard_id().unwrap())        
                     .unwrap()
-                    .lock()
-                    .unwrap()
                     .insert_block_with_parent(block, &h)
             }
             VersaHash::InHash(h) => {
                 self.availability_chains
                     .get(shard_id)        
-                    .unwrap()
-                    .lock()
                     .unwrap()
                     .insert_block_with_parent(block, &h)
             }
@@ -100,15 +101,11 @@ impl Multichain {
 
     pub fn get_longest_proposer_chain_hash(&self) -> H256 {
         self.proposer_chain
-            .lock()
-            .unwrap()
             .tip()
     }
 
     pub fn all_blocks_in_longest_proposer_chain(&self) -> Vec<H256> {
         self.proposer_chain
-            .lock()
-            .unwrap()
             .all_blocks_in_longest_chain()
 
     }
@@ -116,20 +113,14 @@ impl Multichain {
         self.availability_chains
             .get(shard_id)
             .unwrap()
-            .lock()
-            .unwrap()
             .all_blocks_in_longest_chain()
     }
     pub fn all_proposer_blocks_end_with_block(&self, hash: &H256) -> Option<Vec<H256>> {
         self.proposer_chain
-            .lock()
-            .unwrap()
             .all_blocks_end_with_block(hash)
     }
     pub fn get_proposer_block(&self, hash: &H256) -> Option<VersaBlock> {
         self.proposer_chain
-            .lock()
-            .unwrap()
             .get_block(hash)
     }
     pub fn get_tx_blk_in_longest_proposer_chain(
@@ -137,21 +128,15 @@ impl Multichain {
         blk_hash: &H256) -> Option<TransactionBlock> 
     {
         self.proposer_chain
-            .lock()
-            .unwrap()
             .get_tx_blk_in_longest_chain(blk_hash)
     }
     pub fn get_highest_prop_block(&self) -> H256 {
         self.proposer_chain
-            .lock()
-            .unwrap()
             .tip()
     }
     pub fn get_highest_avai_block(&self, shard_id: usize) -> H256 {
         self.availability_chains
             .get(shard_id)
-            .unwrap()
-            .lock()
             .unwrap()
             .tip()
     }

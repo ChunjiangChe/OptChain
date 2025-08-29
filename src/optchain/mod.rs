@@ -274,22 +274,21 @@ pub fn start() {
     info!("configuration: {:?}", config);
 
     // let api_port: u16 = api_addr.port();
-    let prop_chain: Arc<Mutex<Blockchain>> = Arc::new(
-        Mutex::new(
-            Blockchain::new(&config)
-        )
-    );
-    let avai_chains: Vec<Arc<Mutex<Blockchain>>> = (0..config.shard_num)
+    let prop_chain = Blockchain::new(&config);
+    let avai_chains: Vec<Blockchain> = (0..config.shard_num)
         .into_iter()
         .map(|_| {
-            let blockchain = Blockchain::new(&config);
-            Arc::new(Mutex::new(blockchain))
+            Blockchain::new(&config)
         })
         .collect();
-    let chains_ref: Vec<&Arc<Mutex<Blockchain>>> = avai_chains
-        .iter()
-        .collect();
-    let multichain = Multichain::create(&prop_chain, chains_ref, &config);
+    // let chains_ref: Vec<&Arc<Mutex<Blockchain>>> = avai_chains
+    //     .iter()
+    //     .collect();
+    let multichain = Arc::new(
+        Mutex::new(
+            Multichain::create(prop_chain, avai_chains, &config)
+        )
+    );
 
     let mempool = Arc::new(
         Mutex::new(

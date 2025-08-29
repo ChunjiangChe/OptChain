@@ -55,7 +55,7 @@ pub struct Context {
     control_chan: Receiver<ControlSignal>,
     operating_state: OperatingState,
     finished_block_chan: Sender<MinerMessage>,
-    multichain: Multichain,
+    multichain: Arc<Mutex<Multichain>>,
     mempool: Arc<Mutex<Mempool>>,
     // validator: Validator,
     config: Configuration,
@@ -67,7 +67,7 @@ pub struct Handle {
     control_chan: Sender<ControlSignal>,
 }
 
-pub fn new(multichain: &Multichain, 
+pub fn new(multichain: &Arc<Mutex<Multichain>>, 
     mempool: &Arc<Mutex<Mempool>>, 
     config: &Configuration) -> (Context, Handle, Receiver<MinerMessage>) 
 {
@@ -80,7 +80,7 @@ pub fn new(multichain: &Multichain,
         control_chan: signal_chan_receiver,
         operating_state: OperatingState::Paused,
         finished_block_chan: finished_block_sender,
-        multichain: multichain.clone(),
+        multichain: Arc::clone(multichain),
         mempool: Arc::clone(mempool),
         // validator,
         config: config.clone()
@@ -198,9 +198,18 @@ impl Context {
                     let interval = time::Duration::from_micros(i as u64);
                     thread::sleep(interval);
                 }
-                let prop_parent = self.multichain.get_highest_prop_block();
-                let inter_parent = self.multichain.get_highest_avai_block(self.config.shard_id);
-                let global_parents = self.multichain.get_all_highest_avai_blocks();
+                let prop_parent = self.multichain
+                    .lock()
+                    .unwrap()
+                    .get_highest_prop_block();
+                let inter_parent = self.multichain
+                    .lock()
+                    .unwrap()
+                    .get_highest_avai_block(self.config.shard_id);
+                let global_parents = self.multichain
+                    .lock()
+                    .unwrap()
+                    .get_all_highest_avai_blocks();
                 let global_parents_hash = H256::multi_hash(&(
                     global_parents.iter()
                                   .map(|(hash, _)| hash.clone())
@@ -229,6 +238,8 @@ impl Context {
                     };
 
                     let avai_tx_set = match self.multichain
+                        .lock()
+                        .unwrap()
                         .get_avai_tx_blocks(self.config.avai_size) 
                     {
                         Ok(enough_set) => enough_set,

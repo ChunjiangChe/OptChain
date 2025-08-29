@@ -440,9 +440,59 @@ impl Blockchain {
         }
     }
 
-    pub fn get_tx_blk_in_longest_chain(&self, _blk_hash: &H256) -> Option<TransactionBlock> {
-        //to be completed
-        None
+    pub fn get_tx_blk_in_longest_chain(&self, blk_hash: &H256) -> Option<TransactionBlock> {
+        match self.hash2blk.get(blk_hash) {
+            Some(block) => {
+                match block {
+                    VersaBlock::PropBlock(prop_block) => Some(prop_block.get_prop_tx_set()),
+                    VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_avai_tx_set()),
+                    VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_avai_tx_set()),
+                }
+            }
+            None => None,
+        }
+    }
+
+    pub fn get_all_tx_blk_in_longest_chain(&self) -> Vec<TransactionBlock> {
+        let all_hashes = self.all_blocks_in_longest_chain();
+        if all_hashes.len() < 0 {
+            return None;
+        } else {
+            let all_blocks = all_hashes
+                .iter()
+                .map(|hash| self.hash2blk.get(hash).unwrap())
+                .collect();
+            let all_tx_blocks = all_blocks
+                .into_iter()
+                .map(|block| match block {
+                    VersaBlock::PropBlock(prop_block) => prop_block.get_prop_tx_set(),
+                    VersaBlock::ExAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
+                    VersaBlock::InAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
+                })
+                .collect();
+            return Some(all_tx_blocks);
+        }
+    }
+
+    pub fn get_all_tx_blk_in_longest_chain_by_shard(&self, shard_id: usize) -> Vec<TransactionBlock> {
+        let all_hashes = self.all_blocks_in_longest_chain();
+        if all_hashes.len() < 0 {
+            return None;
+        } else {
+            let all_blocks = all_hashes
+                .iter()
+                .map(|hash| self.hash2blk.get(hash).unwrap())
+                .collect();
+            let all_tx_blocks = all_blocks
+                .into_iter()
+                .map(|block| match block {
+                    VersaBlock::PropBlock(prop_block) => prop_block.get_prop_tx_set(),
+                    VersaBlock::ExAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
+                    VersaBlock::InAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
+                })
+                .collect();
+            return Some(all_tx_blocks);
+        }
     }
 
     // pub fn log_to_file(&self) -> Result<(), Error> {
