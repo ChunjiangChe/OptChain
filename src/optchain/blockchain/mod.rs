@@ -337,6 +337,7 @@ impl Blockchain {
                 .iter()
                 .map(|(parent_hash, _)| parent_hash.clone())
                 .collect(),
+            VersaBlock::OrderBlock(order_block) => vec![order_block.get_order_parent()],
         };
         //check whether the valid parent set contains the given parent
         if !parents.contains(parent) {
@@ -494,6 +495,7 @@ impl Blockchain {
                     VersaBlock::PropBlock(prop_block) => prop_block.get_prop_tx_set(),
                     VersaBlock::ExAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
                     VersaBlock::InAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
+                    VersaBlock::OrderBlock(_) => vec![],
                 })
                 .collect();
             let all_tx_blocks: Vec<TransactionBlock> = all_tx_blocks.into_iter().flatten().collect();

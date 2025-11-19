@@ -167,6 +167,25 @@ impl Worker {
                                 Message::Blocks(vec![versa_block])
                             );
                         }
+                        VersaBlock::OrderBlock(order_block) => {
+                            let order_parent = order_block.get_order_parent();
+                            match self.multichain
+                                .lock()
+                                .unwrap()
+                                .insert_block_with_parent(
+                                versa_block.clone(),
+                                &VersaHash::OrderHash(order_parent),
+                                self.config.shard_id
+                            ) {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    info!("inserting myself fail: {}", e);
+                                }
+                            }
+                            self.server.broadcast(
+                                Message::Blocks(vec![versa_block])
+                            );
+                        }
                     }
                 }    
             }

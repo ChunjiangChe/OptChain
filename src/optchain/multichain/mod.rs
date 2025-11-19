@@ -21,13 +21,21 @@ use crate::{
 // };
 use std::time::{SystemTime};
 
+impl Hashable for (H256, u32) {
+    fn hash(&self) -> H256 {
+        H256::pow_hash(&self.0, self.1)
+    }
+}
+
 
 pub struct Multichain {
     pub config: Configuration,
     proposer_chain: Blockchain,
     availability_chains: Vec<Blockchain>,
+    ordering_chain: Blockchain,
     hash2prop_cmts: Database<Vec<TransactionBlock>>, // prop_hash -> prop_tx_block_set
     hash2avai_cmts: Database<Vec<TransactionBlock>>, // avai_hash -> avai_tx_block_set
+    hash2confirmed_avai_blks: Database<Vec<(H256, u32)>>, // prop_hash -> confirmed_avai_hashes
 }
 
 // impl Clone for Multichain {
@@ -49,6 +57,7 @@ impl Multichain {
     pub fn new(
         proposer_chain: Blockchain,
         availability_chains: Vec<Blockchain>, 
+        ordering_chain: Blockchain,
         config: &Configuration) -> Self 
     {
         assert_eq!(proposer_chain.size(), 1);
@@ -57,9 +66,11 @@ impl Multichain {
         }
 
         let mut hash2prop_cmts: Database<Vec<TransactionBlock>> = 
-          Database::<Vec<TransactionBlock>>::new(format!("node(shard-{},index-{})/multichain/hash2propcmt/{:?}", config.shard_id, config.node_id, SystemTime::now()));
+          Database::<Vec<TransactionBlock>>::new(format!("node(shard-{},index-{})/multichain/hash2prop_cmts/{:?}", config.shard_id, config.node_id, SystemTime::now()));
         let mut hash2avai_cmts: Database<Vec<TransactionBlock>> = 
-          Database::<Vec<TransactionBlock>>::new(format!("node(shard-{},index-{})/multichain/avai2propcmt/{:?}", config.shard_id, config.node_id, SystemTime::now()));
+          Database::<Vec<TransactionBlock>>::new(format!("node(shard-{},index-{})/multichain/hash2avai_cmts/{:?}", config.shard_id, config.node_id, SystemTime::now()));
+        let mut hash2confirmed_avai_blks: Database<Vec<(H256, u32)>> = 
+          Database::<Vec<(H256, u32)>>::new(format!("node(shard-{},index-{})/multichain/hash2confirmed_avai_blks/{:?}", config.shard_id, config.node_id, SystemTime::now()));
 
         if let VersaBlock::PropBlock(proposer_genesis_block) = proposer_chain.get_genesis_block() {
             let prop_tx_set = proposer_genesis_block.get_prop_tx_set();
@@ -78,14 +89,21 @@ impl Multichain {
             panic!("Proposer genesis block doesnt exist");
         }
 
-
+        if let VersaBlock::OrderBlock(ordering_genesis_block) = ordering_chain.get_genesis_block() {
+            let confirmed_avai_set = ordering_genesis_block.get_confirmed_avai_set();
+            hash2confirmed_avai_blks.insert(ordering_genesis_block.hash(), confirmed_avai_set).unwrap();
+        } else {
+            panic!("Ordering genesis block doesnt exist");
+        }
         
 
         Multichain {
             proposer_chain,
             availability_chains,
+            ordering_chain,
             hash2prop_cmts,
             hash2avai_cmts,
+            hash2confirmed_avai_blks,
             config: config.clone(),
         }
     }
@@ -149,6 +167,21 @@ impl Multichain {
                             let new_tx_blocks = old_tx_blocks.iter().chain(&tx_blocks).cloned().collect();
                             self.hash2avai_cmts.insert(blk_hash, new_tx_blocks).unwrap();
                         }
+                        Ok(true)
+                    }
+                    Err(e) => Err(e),
+                }
+            }
+            VersaHash::OrderHash(h) => {
+                match self.ordering_chain
+                    .insert_block_with_parent(block.clone(), &h) {
+                    Ok(_) => {
+                        //update hash2confirmed_avai_blks
+                        let old_confirmed_avai_blks = self.hash2confirmed_avai_blks.get(&h).unwrap();
+                        let confirmed_avai_set = block.get_confirmed_avai_set().unwrap();
+                        //combine old_confirmed_avai_blks and confirmed_avai_set.
+                        let new_confirmed_avai_blks = old_confirmed_avai_blks.iter().chain(&confirmed_avai_set).cloned().collect();
+                        self.hash2confirmed_avai_blks.insert(blk_hash, new_confirmed_avai_blks).unwrap();
                         Ok(true)
                     }
                     Err(e) => Err(e),
@@ -259,6 +292,7 @@ impl Multichain {
                     VersaBlock::PropBlock(_) => panic!("Non-avaibility block exists in availability chains"),
                     VersaBlock::ExAvaiBlock(ex_avai_block) => Some(ex_avai_block),
                     VersaBlock::InAvaiBlock(in_avai_block) => Some(in_avai_block),
+                    VersaBlock::OrderBlock(_) => panic!("Non-avaibility block exists in availability chains"),
                 }
             }
             None => None,
@@ -308,6 +342,9 @@ impl Multichain {
                     VersaBlock::InAvaiBlock(in_avai_block) => {
                         println!("Shard {} {:?}\n", i, in_avai_block);
                     }
+                    VersaBlock::OrderBlock(_) => {
+                        panic!("Should be an availability block");
+                    }
                 }
             }
             println!("");
@@ -323,6 +360,38 @@ impl Multichain {
             .get(shard_id)
             .unwrap()
             .get_forking_rate()
+    }
+
+    pub fn get_highest_order_block(&self) -> H256 {
+        self.ordering_chain
+            .tip()
+    }
+
+    pub fn get_new_confirmed_avai_set(&self) -> Vec<(H256, u32)> {
+        let order_parent = self.ordering_chain.tip();
+        let old_confirm_avai_set = self.hash2confirmed_avai_blks.get(&order_parent).unwrap();
+        
+        let all_confirmed_avai_set: Vec<(H256, u32)> = self.availability_chains
+            .iter()
+            .enumerate()
+            .map(|(shard_id, chain)| {
+                let all_avai_blocks = chain.all_blocks_in_longest_chain();
+                let confirmed_avai_blocks: Vec<(H256, u32)> = all_avai_blocks
+                    .iter()
+                    .take(all_avai_blocks.len() - self.config.k)
+                    .cloned()
+                    .map(|h| (h, shard_id as u32))
+                    .collect();
+                confirmed_avai_blocks
+            })
+            .flatten()
+            .collect();
+
+        let new_confirmed_avai_set: Vec<(H256, u32)> = all_confirmed_avai_set
+            .into_iter()
+            .filter(|x| !old_confirm_avai_set.contains(x))
+            .collect();  
+        new_confirmed_avai_set
     }
 
     // pub fn get_all_prop_refer_tx_blks(&self) -> Vec<TransactionBlock> {

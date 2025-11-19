@@ -78,11 +78,17 @@ impl Info for ProposerBlock {
     fn get_global_parents(&self) -> Vec<(H256, usize)> {
         self.header.get_global_parents()
     }
+    fn get_order_parent(&self) -> H256 {
+        self.header.get_order_parent()
+    }
     fn get_prop_root(&self) -> H256 {
         self.header.get_prop_root()
     }
     fn get_avai_root(&self) -> H256 {
         self.header.get_avai_root()
+    }
+    fn get_order_root(&self) -> H256 {
+        self.header.get_order_root()
     }
     fn get_cmt_root(&self) -> H256 {
         self.header.get_cmt_root()

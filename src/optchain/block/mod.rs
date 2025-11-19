@@ -2,6 +2,7 @@ pub mod transaction_block;
 pub mod versa_block;
 pub mod proposer_block;
 pub mod availability_block;
+pub mod ordering_block;
 
 use serde::{Serialize, Deserialize};
 use crate::{
@@ -34,8 +35,10 @@ pub struct BlockHeader {
     prop_parent: H256, //the hash of the highest proposer block
     inter_parent: H256, //the hash of the highest availability block in the shard_id-th shard
     global_parents: Vec<(H256, u32)>, //a set containning the hashes of the highest availability blocks across all shards.
+    order_parent: H256, //the hash of the highest ordering block
     prop_root: H256, //the root of a Merkle tree generated from prop_tx_set
     avai_root: H256, //the root of a Merkle tree generated from avai_tx_set
+    order_root: H256, //the root of a Merkle tree generated from confirm_avai_set
     cmt_root: H256, //the root of a CMT generated from data_blob (is currently replaced by a normal Merkle root)
     // nonce: u32,
     // difficulty: H256,
@@ -46,6 +49,7 @@ pub struct BlockHeader {
 pub struct BlockContent {
     prop_tx_set: MerkleTree<TransactionBlock>, //a set of cmt_root of transaction blocks linked by proposer chain.
     avai_tx_set: MerkleTree<TransactionBlock>, //a set of cmt_root of transaction blocks linked by availability chains.
+    confirmed_avai_set: Vec<(H256, u32)>, //a set of cmt_root of confirmed availability blocks, shard_id
     txs: Vec<Vec<Transaction>>, //a set of transactions
     symbol_merkle_tree: MerkleTree<H256>,
 }
@@ -65,6 +69,9 @@ pub trait Content {
     fn get_avai_tx_set(&self) -> Vec<TransactionBlock>;
     fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock>;
 
+    fn get_confirmed_avai_set(&self) -> Vec<(H256, u32)>;
+    fn get_confirmed_avai_set_ref(&self) -> &Vec<(H256, u32)>;
+
     fn get_txs(&self) -> Vec<Transaction>;
     // fn get_txs_ref(&self) -> &Vec<Transaction>;
 
@@ -78,8 +85,10 @@ pub trait Info {
     fn get_prop_parent(&self) -> H256;
     fn get_inter_parent(&self) -> H256;
     fn get_global_parents(&self) -> Vec<(H256, usize)>;
+    fn get_order_parent(&self) -> H256;
     fn get_prop_root(&self) -> H256;
     fn get_avai_root(&self) -> H256;
+    fn get_order_root(&self) -> H256;
     fn get_cmt_root(&self) -> H256;
     fn get_timestamp(&self) -> SystemTime;
     fn get_info_hash(&self) -> Vec<H256>;
@@ -103,16 +112,20 @@ impl Random for BlockHeader {
         let prop_parent = H256::random();
         let inter_parent = H256::random();
         let global_parents = vec![(prop_parent.clone(), shard_id)];
+        let order_parent = H256::random();
         let prop_root = H256::random();
         let avai_root = H256::random();
+        let order_root = H256::random();
         let cmt_root = H256::random();
         BlockHeader {
             shard_id,
             prop_parent,
             inter_parent,
             global_parents,
+            order_parent,
             prop_root,
             avai_root,
+            order_root,
             cmt_root,
             timestamp: SystemTime::now(),
         }
@@ -161,8 +174,10 @@ impl Default for BlockHeader {
             prop_parent: H256::default(),
             inter_parent: H256::default(),
             global_parents: vec![],
+            order_parent: H256::default(),
             prop_root: H256::default(),
             avai_root: H256::default(),
+            order_root: H256::default(),
             cmt_root: H256::default(),
             timestamp: SystemTime::from(UNIX_EPOCH + Duration::new(0,0)),
         }
@@ -176,8 +191,10 @@ impl BlockHeader {
         prop_parent: H256,
         inter_parent: H256,
         global_parents: Vec<(H256, usize)>,
+        order_parent: H256,
         prop_root: H256,
         avai_root: H256,
+        order_root: H256,
         cmt_root: H256,
         // parent: H256, 
         // nonce: usize, 
@@ -198,8 +215,10 @@ impl BlockHeader {
             prop_parent,
             inter_parent,
             global_parents,
+            order_parent,
             prop_root,
             avai_root,
+            order_root,
             cmt_root,
             timestamp,
             // merkle_root
@@ -231,11 +250,17 @@ impl Info for BlockHeader {
                            .map(|(hash, shard_id)| (hash.clone(), *shard_id as usize))
                            .collect()
     }
+    fn get_order_parent(&self) -> H256 {
+        self.order_parent.clone()
+    }
     fn get_prop_root(&self) -> H256 {
         self.prop_root.clone()
     }
     fn get_avai_root(&self) -> H256 {
         self.avai_root.clone()
+    }
+    fn get_order_root(&self) -> H256 {
+        self.order_root.clone()
     }
     fn get_cmt_root(&self) -> H256 {
         self.cmt_root.clone()
@@ -279,6 +304,7 @@ impl Default for BlockContent {
         BlockContent {
             prop_tx_set: MerkleTree::<TransactionBlock>::new(&[]),
             avai_tx_set: MerkleTree::<TransactionBlock>::new(&[]),
+            confirmed_avai_set: vec![],
             txs: vec![],
             symbol_merkle_tree: MerkleTree::<H256>::new(&[])
         }
@@ -298,6 +324,13 @@ impl Content for BlockContent {
     }
     fn get_avai_tx_set_ref(&self) -> &Vec<TransactionBlock> {
         &self.avai_tx_set.data
+    }
+
+    fn get_confirmed_avai_set(&self) -> Vec<(H256, u32)> {
+        self.confirmed_avai_set.clone()
+    }
+    fn get_confirmed_avai_set_ref(&self) -> &Vec<(H256, u32)> {
+        &self.confirmed_avai_set
     }
 
 
@@ -324,6 +357,7 @@ impl BlockContent {
     pub fn create(
         prop_tx_set: MerkleTree<TransactionBlock>,
         avai_tx_set: MerkleTree<TransactionBlock>,
+        confirmed_avai_set: Vec<(H256, u32)>,
         txs: Vec<Vec<Transaction>>
     ) -> Self {
         let symbols: Vec<H256> = txs.iter()
@@ -339,6 +373,7 @@ impl BlockContent {
         Self {
             prop_tx_set,
             avai_tx_set,
+            confirmed_avai_set,
             txs,
             symbol_merkle_tree,
         }
@@ -416,6 +451,13 @@ impl Content for Block {
         self.content.get_avai_tx_set_ref()
     }
 
+    fn get_confirmed_avai_set(&self) -> Vec<(H256, u32)> {
+        self.content.get_confirmed_avai_set()
+    }
+    fn get_confirmed_avai_set_ref(&self) -> &Vec<(H256, u32)> {
+        self.content.get_confirmed_avai_set_ref()
+    }
+
 
     fn get_txs(&self) -> Vec<Transaction> {
         self.content.get_txs()
@@ -456,11 +498,17 @@ impl Info for Block {
     fn get_global_parents(&self) -> Vec<(H256, usize)> {
         self.header.get_global_parents()
     }
+    fn get_order_parent(&self) -> H256 {
+        self.header.get_order_parent()
+    }
     fn get_prop_root(&self) -> H256 {
         self.header.get_prop_root()
     }
     fn get_avai_root(&self) -> H256 {
         self.header.get_avai_root()
+    }
+    fn get_order_root(&self) -> H256 {
+        self.header.get_order_root()
     }
     fn get_cmt_root(&self) -> H256 {
         self.header.get_cmt_root()
@@ -508,9 +556,17 @@ impl Block {
     //     self.content.get_tx_merkle_proof(tx_index)
     // }
 
-    pub fn construct(shard_id: usize, prop_parent: H256, inter_parent: H256,
-        global_parents: Vec<(H256, usize)>, prop_tx_set: Vec<TransactionBlock>, avai_tx_set: Vec<TransactionBlock>, 
-        txs: Vec<Vec<Transaction>>) -> Block {
+    pub fn construct(
+        shard_id: usize, 
+        prop_parent: H256, 
+        inter_parent: H256,
+        global_parents: Vec<(H256, usize)>, 
+        order_parent: H256,
+        prop_tx_set: Vec<TransactionBlock>, 
+        avai_tx_set: Vec<TransactionBlock>, 
+        confirmed_avai_set: Vec<(H256, u32)>,
+        txs: Vec<Vec<Transaction>>
+    ) -> Block {
 
         // let txs = MerkleTree::<Transaction>::new(txs.as_slice());
         let symbols: Vec<H256> = txs.iter()
@@ -526,17 +582,24 @@ impl Block {
 
         let prop_tx_set = MerkleTree::<TransactionBlock>::new(prop_tx_set.as_slice());
         let avai_tx_set = MerkleTree::<TransactionBlock>::new(avai_tx_set.as_slice());
+        let confirmed_avai_hashes: Vec<H256> = confirmed_avai_set
+                                        .iter()
+                                        .map(|(h, shard_id)| H256::pow_hash(h, *shard_id))
+                                        .collect(); 
+        let confirmed_avai_root = H256::multi_hash(&confirmed_avai_hashes);
         
 
         let header: BlockHeader = BlockHeader {
             shard_id: shard_id as u32, 
             prop_parent,
             inter_parent,
+            order_parent,
             global_parents: global_parents.iter()
                                           .map(|(hash, shard_id)| (hash.clone(), *shard_id as u32))
                                           .collect(),
             prop_root: prop_tx_set.root.clone(),
             avai_root: avai_tx_set.root.clone(),
+            order_root: confirmed_avai_root,
             cmt_root: symbol_merkle_tree.root.clone(),
             timestamp: SystemTime::now(),
         };
@@ -544,6 +607,7 @@ impl Block {
         let content: BlockContent = BlockContent {
             prop_tx_set,
             avai_tx_set,
+            confirmed_avai_set,
             txs,
             symbol_merkle_tree,
         };

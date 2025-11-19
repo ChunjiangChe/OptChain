@@ -14,6 +14,7 @@ use crate::{
     types::{
         hash::{
             H256,
+            Hashable,
         },
         merkle::MerkleTree,
     },
@@ -23,6 +24,7 @@ use crate::{
         block::{
             proposer_block::ProposerBlock,
             availability_block::AvailabilityBlock,
+            ordering_block::OrderingBlock,
             versa_block::VersaBlock,
             transaction_block::TransactionBlock,
             BlockHeader,
@@ -289,7 +291,7 @@ pub fn start(sub_com: &clap::ArgMatches) {
     let prop_genesis_block = VersaBlock::PropBlock(ProposerBlock::default());
     let prop_chain = Blockchain::new(prop_genesis_block, &config);
 
-
+    let mut genesis_avai_set: Vec<(H256, u32)> = vec![];
     let avai_chains: Vec<Blockchain> = (0..config.shard_num)
         .into_iter()
         .map(|i| {
@@ -301,15 +303,27 @@ pub fn start(sub_com: &clap::ArgMatches) {
                 MerkleTree::<TransactionBlock>::new((vec![]).as_slice())
             );
             let avai_genesis_block = VersaBlock::ExAvaiBlock(avai_block);
+            genesis_avai_set.push((avai_genesis_block.hash(), i as u32));
             Blockchain::new(avai_genesis_block, &config)
         })
         .collect();
     // let chains_ref: Vec<&Arc<Mutex<Blockchain>>> = avai_chains
     //     .iter()
     //     .collect();
+    let ordering_genesis_block = VersaBlock::OrderBlock(OrderingBlock::new(
+        BlockHeader::default(),
+        0,
+        genesis_avai_set.clone(),
+    ));
+    let ordering_chain = Blockchain::new(ordering_genesis_block, &config);
     let multichain = Arc::new(
         Mutex::new(
-            Multichain::new(prop_chain, avai_chains, &config)
+            Multichain::new(
+                prop_chain, 
+                avai_chains, 
+                ordering_chain, 
+                &config
+            )
         )
     );
 

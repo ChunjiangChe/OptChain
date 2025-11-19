@@ -5,10 +5,12 @@ use crate::{
             proposer_block::ProposerBlock,
             availability_block::AvailabilityBlock,
             transaction_block::TransactionBlock,
+            ordering_block::OrderingBlock,
         },
     },
     types::hash::{H256, Hashable},
 };
+use core::panic;
 use std::{
     time::SystemTime,
 };
@@ -19,6 +21,7 @@ pub enum VersaBlock {
     PropBlock(ProposerBlock),
     ExAvaiBlock(AvailabilityBlock),
     InAvaiBlock(AvailabilityBlock),
+    OrderBlock(OrderingBlock),
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, Hash, PartialEq)]
@@ -26,6 +29,7 @@ pub enum VersaHash {
     PropHash(H256),
     ExHash(H256),
     InHash(H256),
+    OrderHash(H256),
 }
 
 impl Default for VersaBlock {
@@ -40,6 +44,7 @@ impl Hashable for VersaBlock {
             VersaBlock::PropBlock(prop_block) => prop_block.hash(),
             VersaBlock::ExAvaiBlock(avai_block) => avai_block.hash(),
             VersaBlock::InAvaiBlock(avai_block) => avai_block.hash(),
+            VersaBlock::OrderBlock(order_block) => order_block.hash(),
         }
     }
 }
@@ -50,18 +55,19 @@ impl std::fmt::Debug for VersaBlock {
             VersaBlock::PropBlock(prop_block) => prop_block.fmt(f),
             VersaBlock::ExAvaiBlock(avai_block) => avai_block.fmt(f),
             VersaBlock::InAvaiBlock(avai_block) => avai_block.fmt(f),
+            VersaBlock::OrderBlock(order_block) => order_block.fmt(f),
         }
     }
 }
 
 
 impl VersaBlock {
-
     pub fn verify_hash(&self) -> bool {
         match self {
             VersaBlock::PropBlock(prop_block) => prop_block.verify_hash(),
             VersaBlock::ExAvaiBlock(avai_block) => avai_block.verify_hash(),
             VersaBlock::InAvaiBlock(avai_block) => avai_block.verify_hash(),
+            VersaBlock::OrderBlock(order_block) => order_block.verify_hash(),
         }
     }
 
@@ -70,6 +76,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_shard_id()),
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_shard_id()),
+            VersaBlock::OrderBlock(_) => None,
         }
     }
 
@@ -78,6 +85,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(prop_block) => Some(prop_block.get_prop_parent()),
             VersaBlock::ExAvaiBlock(_) => None,
             VersaBlock::InAvaiBlock(_) => None,
+            VersaBlock::OrderBlock(_) => None,
         }
     }
 
@@ -86,6 +94,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_inter_parent()),
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_inter_parent()),
+            VersaBlock::OrderBlock(_) => None,
         }
     }
 
@@ -94,6 +103,16 @@ impl VersaBlock {
             VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(_) => None,
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_global_parents()),
+            VersaBlock::OrderBlock(_) => None,
+        }
+    }
+
+    pub fn get_order_parent(&self) -> Option<H256> {
+        match self {
+            VersaBlock::PropBlock(_) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
+            VersaBlock::InAvaiBlock(_) => None,
+            VersaBlock::OrderBlock(order_block) => Some(order_block.get_order_parent()),
         }
     }
 
@@ -102,6 +121,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(prop_block) => Some(prop_block.get_prop_root()),
             VersaBlock::ExAvaiBlock(_) => None,
             VersaBlock::InAvaiBlock(_) => None,
+            VersaBlock::OrderBlock(_) => None,
         }
     }
 
@@ -110,6 +130,15 @@ impl VersaBlock {
             VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(avai_block) => Some(avai_block.get_avai_root()),
             VersaBlock::InAvaiBlock(avai_block) => Some(avai_block.get_avai_root()),
+            VersaBlock::OrderBlock(_) => None,
+        }
+    }
+    pub fn get_order_root(&self) -> Option<H256> {
+        match self {
+            VersaBlock::PropBlock(_) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
+            VersaBlock::InAvaiBlock(_) => None,
+            VersaBlock::OrderBlock(order_block) => Some(order_block.get_order_root()),
         }
     }
 
@@ -118,6 +147,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(_) => None,
             VersaBlock::ExAvaiBlock(_) => None,
             VersaBlock::InAvaiBlock(_) => None,
+            VersaBlock::OrderBlock(_) => None,
         }
     }
 
@@ -126,6 +156,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(prop_block) => prop_block.get_timestamp(),
             VersaBlock::ExAvaiBlock(avai_block) => avai_block.get_timestamp(),
             VersaBlock::InAvaiBlock(avai_block) => avai_block.get_timestamp(),
+            VersaBlock::OrderBlock(order_block) => order_block.get_timestamp(),
         }
     }
 
@@ -134,6 +165,7 @@ impl VersaBlock {
             VersaBlock::PropBlock(prop_block) => prop_block.get_info_hash(),
             VersaBlock::ExAvaiBlock(avai_block) => avai_block.get_info_hash(),
             VersaBlock::InAvaiBlock(avai_block) => avai_block.get_info_hash(),
+            VersaBlock::OrderBlock(order_block) => order_block.get_info_hash(),
         }
     }
 
@@ -142,6 +174,15 @@ impl VersaBlock {
             VersaBlock::PropBlock(prop_block) => prop_block.get_prop_tx_set(),
             VersaBlock::ExAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
             VersaBlock::InAvaiBlock(avai_block) => avai_block.get_avai_tx_set(),
+            VersaBlock::OrderBlock(_) => {panic!("Ordering block does not contain transaction blocks")}
+        }
+    }
+    pub fn get_confirmed_avai_set(&self) -> Option<Vec<(H256, u32)>> {
+        match self {
+            VersaBlock::PropBlock(_) => None,
+            VersaBlock::ExAvaiBlock(_) => None,
+            VersaBlock::InAvaiBlock(_) => None,
+            VersaBlock::OrderBlock(order_block) => Some(order_block.get_confirmed_avai_set()),
         }
     }
 }

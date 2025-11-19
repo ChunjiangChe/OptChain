@@ -13,28 +13,26 @@ use std::{
     sync::{Arc, Mutex},
 };
 use crate::{        
+    optchain::{
+        block::{
+            Block, 
+            BlockContent, 
+            Content, 
+            availability_block::AvailabilityBlock, 
+            ordering_block::OrderingBlock, 
+            proposer_block::ProposerBlock, 
+            transaction_block::TransactionBlock, 
+            versa_block::VersaBlock
+        }, 
+        configuration::Configuration, 
+        mempool::Mempool, 
+        multichain::Multichain, 
+        transaction::Transaction,
+    }, 
     types::{
         hash::{H256, Hashable},
         random::Random,
-    }, 
-    optchain::{
-        block::{
-            Content,
-            BlockContent,
-            Block,
-            transaction_block::TransactionBlock,
-            proposer_block::ProposerBlock,
-            availability_block::AvailabilityBlock,
-            versa_block::VersaBlock,
-        },
-        multichain::Multichain,
-        transaction::{Transaction},
-        // validator::{
-        //     Validator,
-        // },
-        configuration::Configuration,
-        mempool::Mempool,
-    },
+    }
 };
 use rand::Rng;
 
@@ -141,6 +139,7 @@ impl Context {
         let mut pre_prop_parent = H256::default();
         let mut pre_inter_parent = H256::default();
         let mut pre_global_parents = H256::default();
+        let mut pre_order_parent = H256::default();
         let mut pre_hybrid_block = Block::default();
         loop {
             // check and react to control signals
@@ -215,12 +214,17 @@ impl Context {
                                   .map(|(hash, _)| hash.clone())
                                   .collect()
                 ));
+                let order_parent = self.multichain
+                    .lock()
+                    .unwrap()
+                    .get_highest_order_block();
                 // let mut txs: Vec<Transaction> = vec![];
                 let txs: Vec<Vec<Transaction>>;
                 //check if parents have been change
                 if prop_parent != pre_prop_parent ||
                     inter_parent != pre_inter_parent ||
-                    global_parents_hash != pre_global_parents {
+                    global_parents_hash != pre_global_parents ||
+                    order_parent != pre_order_parent {
                     
                     // randomly generate a constant number of transactions
                     txs = (0..self.config.num_symbol_per_block)
@@ -250,6 +254,11 @@ impl Context {
                         Ok(enough_set) => enough_set,
                         Err(insufficient_set) => insufficient_set,
                     };
+
+                    let confirmed_avai_set = self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_new_confirmed_avai_set();
                     
                     // let mut supposed_global_parents = global_parents.clone();
                     // supposed_global_parents.retain(|x| x.1 != self.config.shard_id );
@@ -259,8 +268,10 @@ impl Context {
                         prop_parent.clone(),
                         inter_parent.clone(),
                         global_parents,
+                        order_parent.clone(),
                         prop_tx_set,
                         avai_tx_set,
+                        confirmed_avai_set,
                         txs,
                     );
                     //info!("mines a block with parent {:?} of state size: {}", last_blk_hash, last_state.len());
@@ -268,6 +279,7 @@ impl Context {
                     pre_prop_parent = prop_parent;
                     pre_inter_parent = inter_parent;
                     pre_global_parents = global_parents_hash;
+                    pre_order_parent = order_parent;
                     pre_hybrid_block = hybrid_block;
                 }
                 
@@ -280,26 +292,38 @@ impl Context {
                 // supposed_global_parents.push((vec![last_blk_hash.clone()], self.config.shard_id));
                 if hash_val <= tx_diff {
                     if hash_val <= self.config.prop_diff {
-                        if hash_val <= self.config.avai_diff {
-                            if hash_val <= self.config.in_avai_diff {
-                                info!("mine an inclusive availability block {:?} in shard {}", hash_val, self.config.shard_id);
-                                let in_block = VersaBlock::InAvaiBlock(AvailabilityBlock::new(    
-                                    pre_hybrid_block.get_header(),
-                                    nonce,
-                                    pre_hybrid_block.get_avai_merkle_tree(),
-                                ));
-                                self.finished_block_chan
-                                    .send(MinerMessage::VersaBlk(in_block))
-                                    .unwrap();
+                        if hash_val <= self.config.order_diff {
+                            if hash_val <= self.config.avai_diff {
+                                if hash_val <= self.config.in_avai_diff {
+                                    info!("mine an inclusive availability block {:?} in shard {}", hash_val, self.config.shard_id);
+                                    let in_block = VersaBlock::InAvaiBlock(AvailabilityBlock::new(    
+                                        pre_hybrid_block.get_header(),
+                                        nonce,
+                                        pre_hybrid_block.get_avai_merkle_tree(),
+                                    ));
+                                    self.finished_block_chan
+                                        .send(MinerMessage::VersaBlk(in_block))
+                                        .unwrap();
+                                } else {
+                                    info!("mine an exclusive availability block {:?} in shard {}", hash_val, self.config.shard_id);
+                                    let ex_block = VersaBlock::ExAvaiBlock(AvailabilityBlock::new(    
+                                        pre_hybrid_block.get_header(),
+                                        nonce,
+                                        pre_hybrid_block.get_avai_merkle_tree(),
+                                    ));
+                                    self.finished_block_chan
+                                        .send(MinerMessage::VersaBlk(ex_block))
+                                        .unwrap();
+                                }
                             } else {
-                                info!("mine an exclusive availability block {:?} in shard {}", hash_val, self.config.shard_id);
-                                let ex_block = VersaBlock::ExAvaiBlock(AvailabilityBlock::new(    
+                                info!("mine an ordering block {:?}", hash_val);
+                                let order_block = VersaBlock::OrderBlock(OrderingBlock::new(    
                                     pre_hybrid_block.get_header(),
                                     nonce,
-                                    pre_hybrid_block.get_avai_merkle_tree(),
+                                    pre_hybrid_block.get_confirmed_avai_set(),
                                 ));
                                 self.finished_block_chan
-                                    .send(MinerMessage::VersaBlk(ex_block))
+                                    .send(MinerMessage::VersaBlk(order_block))
                                     .unwrap();
                             }
                         } else {
