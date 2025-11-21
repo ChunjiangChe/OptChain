@@ -211,7 +211,7 @@ pub fn start(sub_com: &clap::ArgMatches) {
         .unwrap()
         .parse::<String>()
         .unwrap_or_else(|e| {
-            error!("Error parsing the shard size: {}", e);
+            error!("Error parsing the tx_diff: {}", e);
             process::exit(1);
         });
     let prop_diff = sub_com
@@ -219,7 +219,7 @@ pub fn start(sub_com: &clap::ArgMatches) {
         .unwrap()
         .parse::<String>()
         .unwrap_or_else(|e| {
-            error!("Error parsing the shard size: {}", e);
+            error!("Error parsing the prof_diff: {}", e);
             process::exit(1);
         });
     let avai_diff = sub_com
@@ -227,7 +227,7 @@ pub fn start(sub_com: &clap::ArgMatches) {
         .unwrap()
         .parse::<String>()
         .unwrap_or_else(|e| {
-            error!("Error parsing the shard size: {}", e);
+            error!("Error parsing the avai_diff: {}", e);
             process::exit(1);
         });
     let in_avai_diff = sub_com
@@ -235,7 +235,15 @@ pub fn start(sub_com: &clap::ArgMatches) {
         .unwrap()
         .parse::<String>()
         .unwrap_or_else(|e| {
-            error!("Error parsing the shard size: {}", e);
+            error!("Error parsing the in_avai_diff: {}", e);
+            process::exit(1);
+        });
+    let order_diff = sub_com
+        .value_of("order_diff")
+        .unwrap()
+        .parse::<String>()
+        .unwrap_or_else(|e| {
+            error!("Error parsing the order_diff: {}", e);
             process::exit(1);
         });
     let p2p_workers = sub_com
@@ -261,14 +269,19 @@ pub fn start(sub_com: &clap::ArgMatches) {
     let in_avai_diff_bytes: [u8; 32] = decode_hex(in_avai_diff.as_str())
         .unwrap()
         .try_into().unwrap();
+    let order_diff_bytes: [u8; 32] = decode_hex(order_diff.as_str())
+        .unwrap()
+        .try_into().unwrap();
     let tx_diff_hash: H256 = tx_diff_bytes.into();
     let prop_diff_hash: H256 = prop_diff_bytes.into();
     let avai_diff_hash: H256 = avai_diff_bytes.into();
     let in_avai_diff_hash: H256 = in_avai_diff_bytes.into();
+    let order_diff_hash: H256 = order_diff_bytes.into();
     config.tx_diff = tx_diff_hash;
     config.prop_diff = prop_diff_hash;
     config.avai_diff = avai_diff_hash;
     config.in_avai_diff = in_avai_diff_hash;
+    config.order_diff = order_diff_hash;
     config.block_size = block_size as usize;
     config.symbol_size = symbol_size as usize;
     assert!(block_size % symbol_size == 0);

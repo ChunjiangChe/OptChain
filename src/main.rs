@@ -9,7 +9,7 @@ pub mod optchain;
 pub mod tests;
 use clap::clap_app;
 use env_logger::Env;
-use log::LevelFilter;
+// use log::LevelFilter;
 // use log::{error, info};
 // use std::{
 //     num::ParseIntError,
@@ -172,6 +172,9 @@ fn main() {
             (@arg in_avai_diff:
                 --iDiff [STR]
                 "Sets the difficulty of mining an inclusive availability block")
+            (@arg order_diff:
+                --oDiff [STR]
+                "Sets the difficulty of mining an ordering block")
         )       
     )
     .get_matches();

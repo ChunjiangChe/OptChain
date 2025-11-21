@@ -318,6 +318,18 @@ impl Worker {
 
         for versa_hash in block_hash_vec {
             match versa_hash.clone() {
+                VersaHash::OrderHash(order_hash) => {
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_order_block(
+                        &order_hash) {
+                        Some(_) => {}
+                        None => unreceived_blks.push(
+                            versa_hash
+                        ),
+                    }
+                }
                 VersaHash::PropHash(prop_hash) => {
                     match self.multichain
                         .lock()
@@ -402,6 +414,17 @@ impl Worker {
 
         for versa_hash in hash_vec {
             match versa_hash {
+                VersaHash::OrderHash(order_hash) => {
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_order_block(
+                            &order_hash
+                    ){
+                        Some(block) => res_blks.push(VersaBlock::OrderBlock(block)),
+                        None => {}
+                    }
+                }
                 VersaHash::PropHash(prop_hash) => {
                     match self.multichain
                         .lock()
@@ -475,6 +498,7 @@ impl Worker {
         for block in blocks {
             //verification
             //verify if hash is valid
+    
             if !block.verify_hash() {
                 // return Err(String::from("Incorrect hash"));
                 info!("Reject block {:?} for incorrect hash", block.hash());
@@ -483,6 +507,7 @@ impl Worker {
             let block_hash = block.hash();
             info!("Incoming block {:?}", block_hash);
             
+            //block verification
             let mut is_proposer = false;
             match block.clone() {
                 VersaBlock::PropBlock(_) => is_proposer = true,
@@ -566,10 +591,30 @@ impl Worker {
                         continue;
                     }
                 }
+                VersaBlock::OrderBlock(order_block) => {
+                    let new_confirmed_avai_set = order_block.get_confirmed_avai_set();
+                    let order_parent = order_block.get_order_parent();
+                    let old_confirmed_avai_set = self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_confirmed_avai_set_by_order_hash(&order_parent);
+                    let mut if_overlapping = false;
+                    for item in new_confirmed_avai_set {
+                        if old_confirmed_avai_set.contains(&item) {
+                            if_overlapping = true;
+                            break;
+                        }
+                    }
+                    if if_overlapping {
+                        info!("Reject block {:?}: overlapping confirmed availability set", block_hash);
+                        continue;
+                    }
+                }
             }
             // let shard_id = block.get_shard_id();
             //insert the block
             let (sub_new_hashes, sub_missing_parents) = self.insert_block(block.clone());
+
             if is_proposer {
                 let v_hash = VersaHash::PropHash(block_hash);
                 if sub_new_hashes.contains(&v_hash) {
@@ -769,6 +814,9 @@ impl Worker {
             VersaBlock::PropBlock(prop_block) => {
                 vec![(VersaHash::PropHash(prop_block.get_prop_parent()), 0)]
             }
+            VersaBlock::OrderBlock(order_block) => {
+                vec![(VersaHash::OrderHash(order_block.get_order_parent()), 0)]
+            }
             VersaBlock::ExAvaiBlock(ex_block) => {
                 vec![(VersaHash::ExHash(ex_block.get_inter_parent()), block.get_shard_id().unwrap())]
             }
@@ -800,6 +848,17 @@ impl Worker {
                         .lock()
                         .unwrap()
                         .get_prop_block(&prop_hash) {
+                        Some(_) => {}
+                        None => {
+                            parent_not_exisit = true;
+                        }
+                    }
+                }
+                VersaHash::OrderHash(order_hash) => {
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_order_block(&order_hash) {
                         Some(_) => {}
                         None => {
                             parent_not_exisit = true;
@@ -882,6 +941,8 @@ impl Worker {
                                 => VersaHash::ExHash(inserted_blk.hash()),
                             VersaBlock::InAvaiBlock(_)
                                 => VersaHash::InHash(inserted_blk.hash()),
+                            VersaBlock::OrderBlock(_)
+                                => VersaHash::OrderHash(inserted_blk.hash()),
                         };
                         new_hashs.push(new_hash.clone());
                         info!("successfully inserting block: {:?}", new_hash);

@@ -1,6 +1,6 @@
 pub mod worker;
 
-use log::{info, debug};
+use log::{info};
 use crossbeam::channel::{
     unbounded, 
     Receiver, 
@@ -58,6 +58,7 @@ enum OperatingState {
     ShutDown,
 }
 
+#[allow(unused)]
 pub struct Context {
     /// Channel for receiving control signal
     control_chan: Receiver<ControlSignal>,
@@ -184,6 +185,7 @@ impl Context {
         con_block.hash()
     }
 
+    #[allow(unused)]
     fn check_complete_testimony(&self, tx: &Transaction, tmy: &Testimony) -> bool {
         match &tx.flag {
             &TxFlag::Output => {
@@ -315,7 +317,7 @@ impl Context {
                     .map(|item| H256::multi_hash(&item.0))
                     .collect();
                 let curr_global_parents = H256::multi_hash(&tmp_global_parents);
-                let last_blk_hash = self.multichain.get_longest_chain_hash();
+                let _ = self.multichain.get_longest_chain_hash();
                 //assert_eq!(verified_parent, last_blk_hash);
                 //assert_eq!(inter_parents[0], last_blk_hash);
                 //check if parents have been change
@@ -365,7 +367,7 @@ impl Context {
                         .map(|_| {
                             Transaction::random()
                         }).collect();
-                    let mut tmys: Vec<Testimony> = Vec::new();
+                    let tmys: Vec<Testimony> = Vec::new();
 
                     // let mut invalid_txs: Vec<Transaction> = Vec::new();
                     // let mut invalid_tmys: Vec<Testimony> = Vec::new();

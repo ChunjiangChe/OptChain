@@ -28,8 +28,7 @@ use crate::{
         mempool::Mempool, 
         multichain::Multichain, 
         transaction::Transaction,
-    }, 
-    types::{
+    }, types::{
         hash::{H256, Hashable},
         random::Random,
     }
@@ -236,15 +235,44 @@ impl Context {
                                         .collect();
                                     sym
                                 }).collect();
-
-                    let prop_tx_set = match self.mempool
+                    
+                    let mut prop_tx_set: Vec<TransactionBlock> = vec![];
+                    let mut counter = 0;
+                    let old_prop_tx_set: Vec<H256> = self.multichain
                         .lock()
                         .unwrap()
-                        .get_tx_blocks(self.config.prop_size) 
-                    {
-                        Ok(enough_set) => enough_set,
-                        Err(insufficient_set) => insufficient_set,
-                    };
+                        .get_prop_cmts(&prop_parent)
+                        .iter()
+                        .map(|x| x.hash())
+                        .collect();
+                        
+                    while counter < self.config.prop_size {
+                        match self.mempool
+                            .lock()
+                            .unwrap()
+                            .pop_one_tx_blk() 
+                        {
+                            Some(tx_blk) => {
+                                let tx_blk_hash = tx_blk.hash();
+                                if old_prop_tx_set.contains(&tx_blk_hash) {
+                                    continue;
+                                }
+                                prop_tx_set.push(tx_blk);
+                                counter += 1;
+                            }
+                            None => {
+                                break;
+                            }
+                        }
+                    }
+                    // let prop_tx_set = match self.mempool
+                    //     .lock()
+                    //     .unwrap()
+                    //     .get_tx_blocks(self.config.prop_size) 
+                    // {
+                    //     Ok(enough_set) => enough_set,
+                    //     Err(insufficient_set) => insufficient_set,
+                    // };
 
                     let avai_tx_set = match self.multichain
                         .lock()

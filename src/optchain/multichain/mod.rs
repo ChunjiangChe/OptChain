@@ -8,6 +8,7 @@ use crate::{
             transaction_block::TransactionBlock,
             proposer_block::ProposerBlock,
             availability_block::AvailabilityBlock,
+            ordering_block::OrderingBlock,
         },
     },
     types::{
@@ -196,6 +197,11 @@ impl Multichain {
             .all_blocks_in_longest_chain()
 
     }
+    pub fn all_blocks_in_longest_ordering_chain(&self) -> Vec<H256> {
+        self.ordering_chain
+            .all_blocks_in_longest_chain()
+
+    }
     pub fn all_blocks_in_longest_availability_chain_by_shard(&self, shard_id: usize) -> Vec<H256> {
         self.availability_chains
             .get(shard_id)
@@ -233,6 +239,10 @@ impl Multichain {
             .into_iter()
             .map(|i| (self.availability_chains.get(i).unwrap().tip(), i))
             .collect()
+    }
+
+    pub fn get_prop_cmts(&self, prop_hash: &H256) -> Vec<TransactionBlock> {
+        self.hash2prop_cmts.get(prop_hash).unwrap()
     }
 
     pub fn get_unreferred_cmt(&self, prop_hash: &H256) -> Vec<TransactionBlock> {
@@ -277,6 +287,18 @@ impl Multichain {
                     Some(prop_block)
                 } else {
                     panic!("Non-proposer block exists in proposer chain");
+                }
+            }
+            None => None,
+        }
+    }
+    pub fn get_order_block(&self, hash: &H256) -> Option<OrderingBlock> {
+        match self.ordering_chain.get_block(hash) {
+            Some(versa_block) => {
+                if let VersaBlock::OrderBlock(order_block) = versa_block {
+                    Some(order_block)
+                } else {
+                    panic!("Non-ordering block exists in ordering chain");
                 }
             }
             None => None,
@@ -355,6 +377,10 @@ impl Multichain {
         self.proposer_chain.get_forking_rate()
     }
 
+    pub fn get_ordering_forking_rate(&self) -> f64 {
+        self.ordering_chain.get_forking_rate()
+    }
+
     pub fn get_availability_forking_rate_by_shard(&self, shard_id: usize) -> f64 {
         self.availability_chains
             .get(shard_id)
@@ -365,6 +391,10 @@ impl Multichain {
     pub fn get_highest_order_block(&self) -> H256 {
         self.ordering_chain
             .tip()
+    }
+
+    pub fn get_confirmed_avai_set_by_order_hash(&self, order_hash: &H256) -> Vec<(H256, u32)> {
+        self.hash2confirmed_avai_blks.get(order_hash).unwrap()
     }
 
     pub fn get_new_confirmed_avai_set(&self) -> Vec<(H256, u32)> {

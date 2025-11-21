@@ -16,7 +16,7 @@ use crate::{
     },
     types::{
         hash::{
-            // H256,
+            H256,
             Hashable,
         }
     },
@@ -214,11 +214,16 @@ impl Server {
                                     let timestamp = proposer_versa_block.get_timestamp();
                                     let datetime: DateTime<Local> = timestamp.into();
                                     let formatted_datetime = datetime.format("%Y-%m-%d %H:%M:%S").to_string();
+                                    let prop_tx_set: Vec<H256> = proposer_versa_block
+                                        .get_tx_blocks()
+                                        .iter()
+                                        .map(|tx_blk| tx_blk.hash())
+                                        .collect();
 
                                     let str = h.to_string();
                                     let left_slice = &str[0..3];
                                     let right_slice = &str[61..64];
-                                    format!("{left_slice}..{right_slice}:{formatted_datetime}")
+                                    format!("{left_slice}..{right_slice}:{formatted_datetime}:{prop_tx_set:?}")
                                 })
                                 .collect();
                             let prop_forking_rate = multichain
@@ -226,6 +231,39 @@ impl Server {
                                 .unwrap()
                                 .get_proposer_forking_rate();
                             v_string.push(format!("Proposer chain forking rate: {}", prop_forking_rate));
+                            respond_json!(req, v_string);
+                        }
+                        "/blockchain/ordering-chain" => {
+                            let v = multichain
+                                .lock()
+                                .unwrap()
+                                .all_blocks_in_longest_ordering_chain();
+                            let mut v_string: Vec<String> = v
+                                .into_iter()
+                                .map(|h| {
+                                    let ordering_block = multichain
+                                        .lock()
+                                        .unwrap()
+                                        .get_order_block(&h)
+                                        .unwrap();
+                                    let timestamp = ordering_block.get_timestamp();
+                                    let datetime: DateTime<Local> = timestamp.into();
+                                    let formatted_datetime = datetime.format("%Y-%m-%d %H:%M:%S").to_string();
+                                    let confirmed_avai_set: Vec<(H256, u32)> = ordering_block
+                                        .get_confirmed_avai_set();
+                            
+
+                                    let str = h.to_string();
+                                    let left_slice = &str[0..3];
+                                    let right_slice = &str[61..64];
+                                    format!("{left_slice}..{right_slice}:{formatted_datetime}:{confirmed_avai_set:?}")
+                                })
+                                .collect();
+                            let order_forking_rate = multichain
+                                .lock()
+                                .unwrap()
+                                .get_ordering_forking_rate();
+                            v_string.push(format!("Ordering chain forking rate: {}", order_forking_rate));
                             respond_json!(req, v_string);
                         }
                         "/blockchain/availability-chain" => {
@@ -244,6 +282,11 @@ impl Server {
                                     let timestamp = avai_versa_block.get_timestamp();
                                     let datetime: DateTime<Local> = timestamp.into();
                                     let formatted_datetime = datetime.format("%Y-%m-%d %H:%M:%S").to_string();
+                                    let avai_tx_set: Vec<H256> = avai_versa_block
+                                        .get_avai_tx_set()
+                                        .iter()
+                                        .map(|tx_blk| tx_blk.hash())
+                                        .collect();
 
                                     let type_avai_block = match avai_versa_block.hash() <= config.in_avai_diff {
                                         true => "Inclusive",
@@ -253,7 +296,7 @@ impl Server {
                                     let str = h.to_string();
                                     let left_slice = &str[0..3];
                                     let right_slice = &str[61..64];
-                                    format!("{left_slice}..{right_slice}:{formatted_datetime}({type_avai_block})")
+                                    format!("{left_slice}..{right_slice}:{formatted_datetime}({type_avai_block}):{avai_tx_set:?}")
                                 })
                                 .collect();
                             let avai_forking_rate = multichain
