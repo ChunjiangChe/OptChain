@@ -29,21 +29,12 @@ use crate::{
 
 
 fn main() {
-    //run_bitcoin();
     // init logger
-    
-    // env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    // env_logger::Builder::from_env(Env::default().default_filter_or("error"))
+    //     .init();
 
-    env_logger::Builder::from_env(Env::default().default_filter_or("error"))
-        .init();
+    env_logger::from_env(Env::default().default_filter_or("info")).init();
 
-    // log::error!("This will be printed");
-    // log::warn!("This will NOT be printed");
-    // log::info!("This will NOT be printed");
-    // log::debug!("This will NOT be printed");
-    // assert!(false);
-    //let verbosity = matches.occurrences_of("verbose") as usize;
-    //stderrlog::new().verbosity(verbosity).init().unwrap();
     let matches = clap_app!(Powchain =>
         (version: "0.1")
         (about: "PoW Blockchain client")

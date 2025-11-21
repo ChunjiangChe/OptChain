@@ -288,10 +288,18 @@ impl Blockchain {
 
         //create cmt2block
         let mut cmt2blk: HashMap<H256, H256> = HashMap::new();
-        for tx_block in genesis_block.get_tx_blocks() {
-            let tx_block_hash = tx_block.hash();
-            cmt2blk.insert(tx_block_hash.clone(), genesis_hash.clone());
-            hash2cmt.insert(tx_block_hash, tx_block).unwrap();
+        let if_tx_blocks_exist = match genesis_block.clone() {
+            VersaBlock::PropBlock(_) => true,
+            VersaBlock::ExAvaiBlock(_) => true,
+            VersaBlock::InAvaiBlock(_) => true,
+            VersaBlock::OrderBlock(_) => false,
+        };
+        if if_tx_blocks_exist {
+            for tx_block in genesis_block.get_tx_blocks() {
+                let tx_block_hash = tx_block.hash();
+                cmt2blk.insert(tx_block_hash.clone(), genesis_hash.clone());
+                hash2cmt.insert(tx_block_hash, tx_block).unwrap();
+            }
         }
 
         Blockchain {
@@ -376,10 +384,18 @@ impl Blockchain {
         } 
 
         //update cmt2blk
-        for tx_block in block.get_tx_blocks() {
-            let tx_block_hash = tx_block.hash();
-            self.cmt2blk.insert(tx_block_hash.clone(), blk_hash.clone());
-            self.hash2cmt.insert(tx_block_hash, tx_block).unwrap();
+        let if_tx_blocks_exist = match block.clone() {
+            VersaBlock::PropBlock(_) => true,
+            VersaBlock::ExAvaiBlock(_) => true,
+            VersaBlock::InAvaiBlock(_) => true,
+            VersaBlock::OrderBlock(_) => false,
+        };
+        if if_tx_blocks_exist {
+            for tx_block in block.get_tx_blocks() {
+                let tx_block_hash = tx_block.hash();
+                self.cmt2blk.insert(tx_block_hash.clone(), blk_hash.clone());
+                self.hash2cmt.insert(tx_block_hash, tx_block).unwrap();
+            }   
         }
             
         Ok(true)

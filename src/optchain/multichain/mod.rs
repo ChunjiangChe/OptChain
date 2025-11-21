@@ -406,13 +406,18 @@ impl Multichain {
             .enumerate()
             .map(|(shard_id, chain)| {
                 let all_avai_blocks = chain.all_blocks_in_longest_chain();
-                let confirmed_avai_blocks: Vec<(H256, u32)> = all_avai_blocks
-                    .iter()
-                    .take(all_avai_blocks.len() - self.config.k)
-                    .cloned()
-                    .map(|h| (h, shard_id as u32))
-                    .collect();
-                confirmed_avai_blocks
+                match all_avai_blocks.len() <= self.config.k {
+                    true => vec![],
+                    false => {
+                        let confirmed_avai_blocks: Vec<(H256, u32)> = all_avai_blocks
+                            .iter()
+                            .take(all_avai_blocks.len() - self.config.k)
+                            .cloned()
+                            .map(|h| (h, shard_id as u32))
+                            .collect();
+                        confirmed_avai_blocks
+                    }
+                }
             })
             .flatten()
             .collect();

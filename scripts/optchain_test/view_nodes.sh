@@ -13,6 +13,9 @@ if [ $num_argu -eq 2 ]; then
         echo "proposer chain"  
         ./get_longest_proposer_chain.sh $i $j
         echo ""
+        echo "ordering chain"  
+        ./get_longest_ordering_chain.sh $i $j
+        echo ""
         echo "availability chains"
         for ((k=0; k<$1; k++))
         do
