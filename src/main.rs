@@ -30,10 +30,10 @@ use crate::{
 
 fn main() {
     // init logger
-    // env_logger::Builder::from_env(Env::default().default_filter_or("error"))
-    //     .init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("error"))
+        .init();
 
-    env_logger::from_env(Env::default().default_filter_or("info")).init();
+    // env_logger::from_env(Env::default().default_filter_or("info")).init();
 
     let matches = clap_app!(Powchain =>
         (version: "0.1")

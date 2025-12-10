@@ -74,7 +74,8 @@ ENV PROTOCOL="optchain" \
     AVAI_DIFF="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" \
     IN_AVAI_DIFF="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" \
     EX_DIFF="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" \
-    IN_DIFF="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" 
+    IN_DIFF="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" \
+    ORDER_DIFF="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 
 # 设置容器启动时执行的命令
 CMD ["/app/start.sh"]
