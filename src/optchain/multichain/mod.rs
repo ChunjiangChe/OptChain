@@ -393,8 +393,12 @@ impl Multichain {
             .tip()
     }
 
-    pub fn get_confirmed_avai_set_by_order_hash(&self, order_hash: &H256) -> Vec<(H256, u32)> {
-        self.hash2confirmed_avai_blks.get(order_hash).unwrap()
+    pub fn get_confirmed_avai_set_by_order_hash(&self, order_hash: &H256) -> Result<Vec<(H256, u32)>, String> {
+        if let None = self.hash2confirmed_avai_blks.get(order_hash) {
+            return Err(format!("Ordering block {:?} doesnt exist", order_hash));
+        } else {
+            Ok(self.hash2confirmed_avai_blks.get(order_hash).unwrap())
+        }
     }
 
     pub fn get_new_confirmed_avai_set(&self) -> Vec<(H256, u32)> {

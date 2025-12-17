@@ -592,23 +592,30 @@ impl Worker {
                     }
                 }
                 VersaBlock::OrderBlock(order_block) => {
-                    let new_confirmed_avai_set = order_block.get_confirmed_avai_set();
                     let order_parent = order_block.get_order_parent();
-                    let old_confirmed_avai_set = self.multichain
+                    match self.multichain
                         .lock()
                         .unwrap()
-                        .get_confirmed_avai_set_by_order_hash(&order_parent);
-                    let mut if_overlapping = false;
-                    for item in new_confirmed_avai_set {
-                        if old_confirmed_avai_set.contains(&item) {
-                            if_overlapping = true;
-                            break;
+                        .get_confirmed_avai_set_by_order_hash(&order_parent) {
+                            Ok(old_confirmed_avai_set) => {
+                                let new_confirmed_avai_set = order_block.get_confirmed_avai_set();
+                                let mut if_overlapping = false;
+                                for item in new_confirmed_avai_set {
+                                    if old_confirmed_avai_set.contains(&item) {
+                                        if_overlapping = true;
+                                        break;
+                                    }
+                                }
+                                if if_overlapping {
+                                    info!("Reject block {:?}: overlapping confirmed availability set", block_hash);
+                                    continue;
+                                }
+                            }                           
+                            Err(e) => {
+                                info!("Error: {}", e);
+                                continue;
+                            }
                         }
-                    }
-                    if if_overlapping {
-                        info!("Reject block {:?}: overlapping confirmed availability set", block_hash);
-                        continue;
-                    }
                 }
             }
             // let shard_id = block.get_shard_id();

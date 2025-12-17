@@ -174,13 +174,21 @@ fn test_block_size() {
             );
             tx_block
         }).collect();
+    let confirmed_avai_tx_set: Vec<(H256, u32)> = vec![
+        (H256::default(), 0),
+        (H256::default(), 1),
+        (H256::default(), 2),
+        (H256::default(), 3),
+    ];
     let hybrid_block = Block::construct(
         0,
         H256::default(),
         H256::default(),
         vec![(H256::default(), 0), (H256::default(), 1), (H256::default(), 2), (H256::default(), 3)],
+        H256::default(),        
         prop_tx_set,
         avai_tx_set,
+        confirmed_avai_tx_set,
         txs,
     );
 
