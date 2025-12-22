@@ -60,13 +60,7 @@ use crate::{
 use smol::channel;
 use log::{error, info};
 use std::{
-    net, 
-    process, 
-    thread, 
-    time, 
-    sync::{Arc, Mutex},
-    num::ParseIntError,
-    convert::TryInto,
+    collections::HashMap, convert::TryInto, net, num::ParseIntError, process, sync::{Arc, Mutex}, thread, time
 };
 // use env_logger::Env;
 
@@ -368,6 +362,9 @@ pub fn start(sub_com: &clap::ArgMatches) {
         &mempool,
         &symbolpool,
         &config,
+        &Arc::new(Mutex::new(HashMap::new())), // pending requests
+        &Arc::new(Mutex::new(HashMap::new())), // unavailable_cmt2avai_blocks
+        &Arc::new(Mutex::new(HashMap::new())), // unavailable_avai_block2cmts
     );
     worker_ctx.start();
 

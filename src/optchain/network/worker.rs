@@ -48,9 +48,9 @@ pub struct Worker {
     symbolpool: Arc<Mutex<SymbolPool>>,
     config: Configuration,
     // validator: Validator,
-    blk_buff: HashMap<VersaHash, Vec<VersaBlock>>,
-    unavailable_cmt2avai_blocks: HashMap<H256, Vec<VersaBlock>>, //cmt -> avai blocks containing cmt
-    unavailable_avai_block2cmts: HashMap<H256, Vec<H256>> // avai block hash -> cmts
+    blk_buff: Arc<Mutex<HashMap<VersaHash, Vec<VersaBlock>>>>,
+    unavailable_cmt2avai_blocks: Arc<Mutex<HashMap<H256, Vec<VersaBlock>>>>, //cmt -> avai blocks containing cmt
+    unavailable_avai_block2cmts: Arc<Mutex<HashMap<H256, Vec<H256>>>> // avai block hash -> cmts
 }
 
 // pub type SampleIndex = (H256, u32, u32); //block_hash, tx_index, shard_id
@@ -65,18 +65,21 @@ impl Worker {
         mempool: &Arc<Mutex<Mempool>>,
         symbolpool: &Arc<Mutex<SymbolPool>>,
         config: &Configuration,
+        blk_buff: &Arc<Mutex<HashMap<VersaHash, Vec<VersaBlock>>>>,
+        unavailable_cmt2avai_blocks: &Arc<Mutex<HashMap<H256, Vec<VersaBlock>>>>, //cmt -> avai blocks containing cmt
+        unavailable_avai_block2cmts: &Arc<Mutex<HashMap<H256, Vec<H256>>>> // avai block hash -> cmts
     ) -> Self {
         Self {
             msg_chan: msg_src,
             num_worker,
             server: server.clone(),
             multichain: Arc::clone(multichain),
-            blk_buff: HashMap::new(),
+            blk_buff: Arc::clone(blk_buff),
             mempool: Arc::clone(mempool),
             symbolpool: Arc::clone(symbolpool),
             config: config.clone(),
-            unavailable_cmt2avai_blocks: HashMap::new(),
-            unavailable_avai_block2cmts: HashMap::new(),
+            unavailable_cmt2avai_blocks: Arc::clone(unavailable_cmt2avai_blocks),
+            unavailable_avai_block2cmts: Arc::clone(unavailable_avai_block2cmts),
         }
     }
 
@@ -529,7 +532,10 @@ impl Worker {
                     let ex_or_in = block.get_shard_id().unwrap() == self.config.shard_id;
                     //verify the availablility of referenced cmts
                     //first check whether it is already marked as unavailable
-                    match self.unavailable_avai_block2cmts.get(&block_hash) {
+                    match self.unavailable_avai_block2cmts
+                        .lock()
+                        .unwrap()
+                        .get(&block_hash) {
                         Some(missing_cmts) => {
                             for missing_cmt in missing_cmts {
                                 match self.symbolpool
@@ -579,16 +585,18 @@ impl Worker {
                     }
                     if !unavailable_cmts.is_empty() {
                         for unavai_cmt in unavailable_cmts.iter() {
-                            match self.unavailable_cmt2avai_blocks.get(unavai_cmt) {
-                                Some(old_avai_blocks) => {
-                                    if !old_avai_blocks.contains(&block) {
-                                        let mut new_avai_blocks = old_avai_blocks.clone();
-                                        new_avai_blocks.push(block.clone());
-                                        self.unavailable_cmt2avai_blocks.insert(unavai_cmt.clone(), new_avai_blocks);
+                            {
+                                let mut map = self.unavailable_cmt2avai_blocks.lock().unwrap();
+
+                                match map.get_mut(unavai_cmt) {
+                                    Some(old_avai_blocks) => {
+                                        if !old_avai_blocks.contains(&block) {
+                                            old_avai_blocks.push(block.clone());
+                                        }
                                     }
-                                }
-                                None => {
-                                    self.unavailable_cmt2avai_blocks.insert(unavai_cmt.clone(), vec![block.clone()]);
+                                    None => {
+                                        map.insert(unavai_cmt.clone(), vec![block.clone()]);
+                                    }
                                 }
                             }
                         }
@@ -601,7 +609,7 @@ impl Worker {
                                     .unwrap();
                             assert!(!unreceived_symbols.is_empty());
                         }
-                        self.unavailable_avai_block2cmts.insert(block_hash, unavailable_cmts);
+                        self.unavailable_avai_block2cmts.lock().unwrap().insert(block_hash, unavailable_cmts);
                         continue;
                     }
                 }
@@ -779,30 +787,71 @@ impl Worker {
                 {
                     info!("cmt {:?} is now available", cmt_root);
                     //all symbols for cmt in symbol_index is received
-                    if let Some(unavai_blocks) = self.unavailable_cmt2avai_blocks.get(&cmt_root) {
-                        for unavai_block in unavai_blocks.clone() {
-                            let unavai_block_hash = unavai_block.hash();
-                            if let Some(unavai_cmts) = self.unavailable_avai_block2cmts.get(&unavai_block_hash) {
-                                info!("handle block {:?} for cmt {:?} becoming available", unavai_block_hash, cmt_root);
-                                let mut a_unavai_cmts = unavai_cmts.clone();
-                                a_unavai_cmts.retain(|&x| x != cmt_root);
-                                if a_unavai_cmts.is_empty() {
-                                    //time to insert unavia_block
-                                    info!("block {:?} is now available", unavai_block_hash);
-                                    let (sub_new_hashes, sub_missing_parents) 
-                                        = self.insert_block(unavai_block.clone());
-                                    new_hashes.extend(sub_new_hashes);
-                                    missing_parents.extend(sub_missing_parents);
-
-                                    //delete the item in unavailable_avai_block2cmts
-                                    self.unavailable_avai_block2cmts.remove(&unavai_block_hash);
-                                } else {
-                                    self.unavailable_avai_block2cmts.insert(unavai_block_hash, a_unavai_cmts);
-                                }        
+                    {
+                        // 1) First, copy out the blocks corresponding to cmt_root.
+                        //    Lock is held only briefly and released immediately.
+                        let unavai_blocks: Vec<_> = {
+                            let map = self.unavailable_cmt2avai_blocks.lock().unwrap();
+                            match map.get(&cmt_root) {
+                                Some(v) => v.clone(),
+                                None => Vec::new(),
                             }
+                        };
+
+                        if !unavai_blocks.is_empty() {
+                            for unavai_block in unavai_blocks {
+                                let unavai_block_hash = unavai_block.hash();
+
+                                // 2) Read the cmts associated with this block hash.
+                                //    Clone the data while holding the lock, then release it immediately.
+                                let unavai_cmts_opt: Option<Vec<_>> = {
+                                    let map = self.unavailable_avai_block2cmts.lock().unwrap();
+                                    map.get(&unavai_block_hash).cloned()
+                                };
+
+                                if let Some(mut a_unavai_cmts) = unavai_cmts_opt {
+                                    info!(
+                                        "handle block {:?} for cmt {:?} becoming available",
+                                        unavai_block_hash, cmt_root
+                                    );
+
+                                    // 3) Perform retain logic outside of any lock
+                                    a_unavai_cmts.retain(|&x| x != cmt_root);
+
+                                    if a_unavai_cmts.is_empty() {
+                                        // 4) insert_block may internally acquire other locks or do heavy work,
+                                        //    so it must be called without holding any mutex.
+                                        info!("block {:?} is now available", unavai_block_hash);
+
+                                        let (sub_new_hashes, sub_missing_parents) =
+                                            self.insert_block(unavai_block.clone());
+                                        new_hashes.extend(sub_new_hashes);
+                                        missing_parents.extend(sub_missing_parents);
+
+                                        // 5) Remove the entry from unavailable_avai_block2cmts
+                                        //    (short-lived lock)
+                                        self.unavailable_avai_block2cmts
+                                            .lock()
+                                            .unwrap()
+                                            .remove(&unavai_block_hash);
+                                    } else {
+                                        // 6) Update unavailable_avai_block2cmts with the remaining cmts
+                                        //    (short-lived lock)
+                                        self.unavailable_avai_block2cmts
+                                            .lock()
+                                            .unwrap()
+                                            .insert(unavai_block_hash, a_unavai_cmts);
+                                    }
+                                }
+                            }
+
+                            // 7) Finally, remove cmt_root from unavailable_cmt2avai_blocks
+                            //    (short-lived lock)
+                            self.unavailable_cmt2avai_blocks
+                                .lock()
+                                .unwrap()
+                                .remove(&cmt_root);
                         }
-                        self.unavailable_cmt2avai_blocks.remove(&cmt_root);
-                        
                     }
                 }
                                
@@ -912,16 +961,15 @@ impl Worker {
 
             //put the block in buff
             if parent_not_exisit {
-                match self.blk_buff.get(&parent_hash) {
-                    Some(old_blks) => {
-                        if !old_blks.contains(&block) {
-                            let mut new_blks = old_blks.clone();
-                            new_blks.push(block.clone());
-                            self.blk_buff.insert(parent_hash.clone(), new_blks);
+                let mut blk_buff = self.blk_buff.lock().unwrap();
+                match blk_buff.get_mut(&parent_hash) {
+                    Some(v) => {
+                        if !v.contains(&block) {
+                            v.push(block.clone());
                         }
                     }
                     None => {
-                        self.blk_buff.insert(parent_hash.clone(), vec![block.clone()]);
+                        blk_buff.insert(parent_hash.clone(), vec![block.clone()]);
                     }
                 }
                 
@@ -971,7 +1019,7 @@ impl Worker {
 
                         //if there are some blocks in the buff whose parent is the new block,
                         //continue to insert it
-                        match self.blk_buff.get(&new_hash) {
+                        match self.blk_buff.lock().unwrap().get(&new_hash) {
                             Some(child_blks) => {
                                 for child_blk in child_blks {
                                     inserted_blks.push_back(child_blk.clone());
@@ -990,7 +1038,7 @@ impl Worker {
                 }
             }
             for item2 in removed_buff {
-                self.blk_buff.remove(&item2);
+                self.blk_buff.lock().unwrap().remove(&item2);
             }
         }
         (new_hashs, missing_parents)
