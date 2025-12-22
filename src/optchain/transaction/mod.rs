@@ -66,8 +66,8 @@ impl Random for Transaction {
             value: rng.gen_range(1..1000) as u32,
             public_key_ref: key_pair::random().public_key().as_ref().to_vec(),
         };
-        let inputs: Vec<UtxoInput> = vec![input];
-        let outputs: Vec<UtxoOutput> = vec![output];
+        let inputs: Vec<UtxoInput> = vec![input; 20];
+        let outputs: Vec<UtxoOutput> = vec![output; 20];
 
         Transaction {
             inputs,

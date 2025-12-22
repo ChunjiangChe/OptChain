@@ -220,10 +220,10 @@ impl Server {
                                         .map(|tx_blk| tx_blk.hash())
                                         .collect();
 
-                                    let str = h.to_string();
-                                    let left_slice = &str[0..3];
-                                    let right_slice = &str[61..64];
-                                    format!("{left_slice}..{right_slice}:{formatted_datetime}:{prop_tx_set:?}")
+                                    // let str = h.to_string();
+                                    // let left_slice = &str[0..3];
+                                    // let right_slice = &str[61..64];
+                                    format!("{:?}:{formatted_datetime}:{prop_tx_set:?}", h)
                                 })
                                 .collect();
                             let prop_forking_rate = multichain
@@ -253,10 +253,10 @@ impl Server {
                                         .get_confirmed_avai_set();
                             
 
-                                    let str = h.to_string();
-                                    let left_slice = &str[0..3];
-                                    let right_slice = &str[61..64];
-                                    format!("{left_slice}..{right_slice}:{formatted_datetime}:{confirmed_avai_set:?}")
+                                    // let str = h.to_string();
+                                    // let left_slice = &str[0..3];
+                                    // let right_slice = &str[61..64];
+                                    format!("{:?}:{formatted_datetime}:{confirmed_avai_set:?}", h)
                                 })
                                 .collect();
                             let order_forking_rate = multichain
@@ -293,10 +293,10 @@ impl Server {
                                         false => "Exclusive",
                                     }; 
 
-                                    let str = h.to_string();
-                                    let left_slice = &str[0..3];
-                                    let right_slice = &str[61..64];
-                                    format!("{left_slice}..{right_slice}:{formatted_datetime}({type_avai_block}):{avai_tx_set:?}")
+                                    // let str = h.to_string();
+                                    // let left_slice = &str[0..3];
+                                    // let right_slice = &str[61..64];
+                                    format!("{h:?}:{formatted_datetime}({type_avai_block}):{avai_tx_set:?}")
                                 })
                                 .collect();
                             let avai_forking_rate = multichain
@@ -344,10 +344,10 @@ impl Server {
                                     let datetime: DateTime<Local> = timestamp.into();
                                     let formatted_datetime = datetime.format("%Y-%m-%d %H:%M:%S").to_string();
 
-                                    let str = h.to_string();
-                                    let left_slice = &str[0..3];
-                                    let right_slice = &str[61..64];
-                                    format!("{left_slice}..{right_slice}:{formatted_datetime}")
+                                    // let str = h.to_string();
+                                    // let left_slice = &str[0..3];
+                                    // let right_slice = &str[61..64];
+                                    format!("{h:?}:{formatted_datetime}")
                                 })
                                 .collect();
                             respond_json!(req, v_string);

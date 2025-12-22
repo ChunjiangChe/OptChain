@@ -30,10 +30,10 @@ use crate::{
 
 fn main() {
     // init logger
-    env_logger::Builder::from_env(Env::default().default_filter_or("error"))
-        .init();
+    // env_logger::Builder::from_env(Env::default().default_filter_or("error"))
+    //     .init();
 
-    // env_logger::from_env(Env::default().default_filter_or("info")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let matches = clap_app!(Powchain =>
         (version: "0.1")
@@ -56,7 +56,7 @@ fn main() {
                 "Sets the peers to connect to at start")
             (@arg p2p_workers: 
                 --("p2p-workers") [INT] 
-                default_value("4") 
+                default_value("1") 
                 "Sets the number of worker threads for P2P server")
             (@arg shard_id:
                 --shardId [INT]

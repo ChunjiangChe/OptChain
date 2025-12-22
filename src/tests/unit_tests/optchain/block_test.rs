@@ -144,7 +144,6 @@ use bincode;
 fn test_block_size() {
     let block_size = 8192;
     let symbol_size = 64;
-    let symbol_num = 4;
     let txs: Vec<Vec<Transaction>> = (0..(block_size / symbol_size))
         .into_iter()
         .map(|_| {

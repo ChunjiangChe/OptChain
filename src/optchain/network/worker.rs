@@ -298,7 +298,7 @@ impl Worker {
             // }
             new_tx_blk_hashes.push(hash);
             self.mempool.lock().unwrap().insert_tx_blk(blk.clone());
-            info!("Incoming tx block {:?}", hash);
+            // info!("Incoming tx block {:?}", hash);
         }
         if !new_tx_blk_hashes.is_empty() {
             Some(Message::NewTxBlockHash(new_tx_blk_hashes))
@@ -505,7 +505,21 @@ impl Worker {
                 continue;
             }
             let block_hash = block.hash();
-            info!("Incoming block {:?}", block_hash);
+            match block.clone() {
+                VersaBlock::PropBlock(_) => {
+                    info!("Incoming proposer block {:?}", block_hash);
+                }
+                VersaBlock::ExAvaiBlock(_) => {
+                    info!("Incoming exclusive availability block {:?}", block_hash);
+                }
+                VersaBlock::InAvaiBlock(_) => {
+                    info!("Incoming inclusive availability block {:?}", block_hash);    
+                }
+                VersaBlock::OrderBlock(_) => {
+                    info!("Incoming ordering block {:?}", block_hash);  
+                }
+            }
+            
             
             //block verification
             let mut is_proposer = false;
@@ -660,7 +674,7 @@ impl Worker {
             true => None,
             false => Some(Message::GetSymbols(missing_symbol_indexs)),
         };
-        info!("missing_symbol_indexs: {:?}", res_missing_symbol_indexs);
+        // info!("missing_symbol_indexs: {:?}", res_missing_symbol_indexs);
         
 
         (res_new_hashes, res_missing_blks, res_missing_symbol_indexs)
@@ -699,7 +713,7 @@ impl Worker {
 
     fn handle_get_symbols(&self, symbol_indexs: Vec<SymbolIndex>) -> Option<Message> {
         let mut res_symbols: Vec<Symbol> = vec![];
-        info!("Handle get symbol: {:?}", symbol_indexs);
+        // info!("Handle get symbol: {:?}", symbol_indexs);
         for index in symbol_indexs.iter() {
 
             match self.symbolpool.lock()
@@ -717,7 +731,7 @@ impl Worker {
             let res_symbol_indexs: Vec<SymbolIndex> = res_symbols.iter()
                                     .map(|s| s.get_index().clone())
                                     .collect();
-            info!("Return get symbol: {:?}", res_symbol_indexs);
+            // info!("Return get symbol: {:?}", res_symbol_indexs);
             Some(Message::Symbols(res_symbols))
         } else {
             None
@@ -733,7 +747,7 @@ impl Worker {
 
         for symbol in symbols {
             let symbol_index = symbol.get_index();
-            info!("Incoming symbol: {:?}", symbol_index);
+            // info!("Incoming symbol: {:?}", symbol_index);
             let if_requested = self.symbolpool.lock()
                               .unwrap()
                               .check_if_requested(&symbol_index) ;
@@ -742,11 +756,11 @@ impl Worker {
                                .unwrap()
                                .insert_symbol(symbol) {
                     Ok(true) => {
-                        info!("Symbol (cmt {:?}, index {:?}) has been inserted", symbol_index.get_root(), symbol_index.get_index());
+                        // info!("Symbol (cmt {:?}, index {:?}) has been inserted", symbol_index.get_root(), symbol_index.get_index());
                         new_symbols.push(symbol_index.clone());
                     }
                     Ok(false) => {
-                        info!("Symbol already exists");
+                        // info!("Symbol already exists");
                         continue;
                     }
                     Err(e) => {
