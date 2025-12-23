@@ -370,7 +370,7 @@ impl Worker {
                     }
                 }
                 VersaHash::InHash(in_hash) => {
-                    let mut is_found = false;
+                    let mut is_found = true;
                     //not sure the shard id of the exclusive block based on its hash
                     for id in 0..self.config.shard_num {
                         match self.multichain
@@ -380,11 +380,11 @@ impl Worker {
                             &in_hash,
                             id
                         ){
-                            Some(_) => {
-                                is_found = true;
+                            Some(_) => {}
+                            None => {
+                                is_found = false;
                                 break;
                             }
-                            None => {}
                         }
                     }
                     if !is_found {
@@ -511,15 +511,51 @@ impl Worker {
             match block.clone() {
                 VersaBlock::PropBlock(_) => {
                     info!("Incoming proposer block {:?}", block_hash);
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_prop_block(
+                        &block_hash) {
+                        Some(_) => {
+                            info!("Proposer block {:?} already exists", block_hash);
+                            continue;
+                        }
+                        None => {}
+                    }
                 }
                 VersaBlock::ExAvaiBlock(_) => {
                     info!("Incoming exclusive availability block {:?}", block_hash);
+                    let shard_id = block.get_shard_id().unwrap();
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_avai_block_by_shard(
+                        &block_hash,
+                        shard_id
+                    ) {
+                        Some(_) => {
+                            info!("Exclusive availability block {:?} already exists", block_hash);
+                            continue;
+                        }
+                        None => {}
+                    }
                 }
                 VersaBlock::InAvaiBlock(_) => {
                     info!("Incoming inclusive availability block {:?}", block_hash);    
                 }
                 VersaBlock::OrderBlock(_) => {
                     info!("Incoming ordering block {:?}", block_hash);  
+                    match self.multichain
+                        .lock()
+                        .unwrap()
+                        .get_order_block(
+                        &block_hash) {
+                        Some(_) => {
+                            info!("Ordering block {:?} already exists", block_hash);
+                            continue;
+                        }
+                        None => {}
+                    }
                 }
             }
             

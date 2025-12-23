@@ -160,7 +160,7 @@ impl SymbolPool {
                 };
                 let request_indexs = (0..self.config.num_symbol_per_block).choose_multiple(&mut rng, req_num);
                 self.root2index.insert(hash.clone(), request_indexs.clone());
-                info!("cmt {:?} requested (indexs: {:?})", hash, request_indexs);
+                // info!("cmt {:?} requested (indexs: {:?})", hash, request_indexs);
                 
                 let request_symbol_index: Vec<SymbolIndex> = request_indexs
                     .into_iter()
@@ -178,11 +178,11 @@ impl SymbolPool {
                 let mut unreceived_indexs: Vec<SymbolIndex> = vec![];
                 for idx in indexs.iter() {
                     let symbol_index = SymbolIndex::new(hash.clone(), *idx);
-                    info!("symbol_index: {:?}", symbol_index);
+                    // info!("symbol_index: {:?}", symbol_index);
                     match self.hash2symbol.get(&symbol_index.hash()) {
                         Some(_) => {}
                         None => {
-                            info!("symbol doesnt exist");
+                            // info!("symbol doesnt exist");
                             unreceived_indexs.push(symbol_index);
                         },
                     }
@@ -226,7 +226,7 @@ impl SymbolPool {
                     }
                     None => {
                         self.hash2symbol.insert(symbol_hash, sym).unwrap();
-                        info!("symbol (cmt: {:?}, index: {:?}) is inserted", cmt_root, sym_index);
+                        // info!("symbol (cmt: {:?}, index: {:?}) is inserted", cmt_root, sym_index);
                         return Ok(true);
                     }
                 }
