@@ -110,7 +110,7 @@ fn main() {
                 "Sets the peers to connect to at start")
             (@arg p2p_workers: 
                 --("p2p-workers") [INT] 
-                default_value("1") 
+                default_value("4") 
                 "Sets the number of worker threads for P2P server")
             (@arg shard_id:
                 --shardId [INT]

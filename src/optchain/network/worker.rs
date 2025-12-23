@@ -544,8 +544,8 @@ impl Worker {
                                     .get_unreceived_symbols(&missing_cmt) {
                                     Ok(sub_missing_symbol_indexs) => {  
                                         if sub_missing_symbol_indexs.is_empty() {
-                                            // info!("cmt {:?} should not be available!", missing_cmt);
-                                            panic!("cmt {:?} should not be available!", missing_cmt);
+                                            info!("cmt {:?} should not be available!", missing_cmt);
+                                            // panic!("cmt {:?} should not be available!", missing_cmt);
                                         }                              
                                         // assert!(!missing_symbol_indexs.is_empty());
                                         missing_symbol_indexs.extend(sub_missing_symbol_indexs);
