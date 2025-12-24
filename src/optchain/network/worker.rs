@@ -573,6 +573,7 @@ impl Worker {
                         .unwrap()
                         .get(&block_hash) {
                         Some(missing_cmts) => {
+                            let mut if_available = true;
                             for missing_cmt in missing_cmts {
                                 match self.symbolpool
                                     .lock()
@@ -584,13 +585,18 @@ impl Worker {
                                             // panic!("cmt {:?} should not be available!", missing_cmt);
                                         }                              
                                         // assert!(!missing_symbol_indexs.is_empty());
+                                        if_available = false;
                                         missing_symbol_indexs.extend(sub_missing_symbol_indexs);
                                     }
                                     Err(e) => panic!("Error {e}"),
                                 }
                             }
-                            info!("Reject block {:?}: in unavailable hash table", block_hash);
-                            continue;
+                            if if_available {
+                                info!("Process block {:?}: in unavailable hash table", block_hash);    
+                            } else {
+                                info!("Reject block {:?}: in unavailable hash table", block_hash);
+                                continue;
+                            }
                         }
                         None => {}
                     }
@@ -1025,17 +1031,17 @@ impl Worker {
             // }
             
 
-            let mut inserted_blks: VecDeque<VersaBlock> = VecDeque::new();
-            inserted_blks.push_back(block.clone());
+            let mut inserted_blks: VecDeque<(VersaBlock, VersaHash)> = VecDeque::new();
+            inserted_blks.push_back((block.clone(), parent_hash.clone()));
             let mut removed_buff: Vec<VersaHash> = vec![];
             while !inserted_blks.is_empty() {
-                let inserted_blk = inserted_blks.pop_front().unwrap();
+                let (inserted_blk, inserted_parent_hash) = inserted_blks.pop_front().unwrap();
                 match self.multichain
                     .lock()
                     .unwrap()
                     .insert_block_with_parent(
                     inserted_blk.clone(),
-                    &parent_hash,
+                    &inserted_parent_hash,
                     inserted_shard_id
                 ) {
                     Ok(_) => {
@@ -1058,7 +1064,7 @@ impl Worker {
                         match self.blk_buff.lock().unwrap().get(&new_hash) {
                             Some(child_blks) => {
                                 for child_blk in child_blks {
-                                    inserted_blks.push_back(child_blk.clone());
+                                    inserted_blks.push_back((child_blk.clone(), new_hash.clone()));
                                 }
                                 removed_buff.push(new_hash);
                             }
