@@ -1,114 +1,149 @@
-# Implementation of Manifolchain
+# OptChain
 
-This project aims to design and implement a high-throughput sharding Blockchain system, employing novel mining protocol and verification mechanism.
+OptChain is a high-performance, sharding Proof-of-Work (PoW) blockchain protocol implemented in Rust. It utilizes a novel multi-chain architecture—consisting of Proposer, Availability, and Ordering chains—to optimize throughput and data availability verification.
 
-## Architecture
+This repository contains the client implementation for running an OptChain node, including networking, mining, and consensus logic.
 
-![](./img/architecture.png)
+## Prerequisites
 
-## Overview of Modules
+To compile and run OptChain, you need to have the Rust toolchain installed.
 
-- **Mempool** receives format-verified transactions and testimonies from network and matches testimonies to its corresponding transaction. Uporn requests from Miner, it returns transactions with their corresponding testimonies.
-- **Miner** gets transactions and testimonies from Mempool, performs double-spending checking via Validator, and runs PoW to generate a valid block. Uporn a valid block is generated, it is passed to Multichain for insertion and it is simultaneously passed to Network for broadcasting.
-- **Network** is responsible for handling communication among different nodes. It runs Gossip protocol to receive, respond, and broadcast message. There are totally three types of message to handle: transaction, testimony, and block. When receiving messages, it delegates Validator for processing.
-- **Validator** inherits all the validation functionalities, including format validation and double-spending validation from transactions and blocks. It requests necessary information from Multichain for validation. There are totally four validation sources from Miner and Network:
-  - Validate transactions from Network: check the format of transactions, including validity of signatures and coins. Verified transactions are pushed into the Mempool.
-  - Validate blocks from Network: check both the format validity and double-spending existence based on node's view. Verified blocks are inserted into the Multichain.
-  - Validate transactions from Miner: check the double-spending existence based on node's view to make sure that a new-generated block will be accepted by other nodes. (The first validation source already ensures that each transaction pop from Mempool meets format validity.) Validator returns `true` or `false` for each incoming transaction to Miner.
-- **Multichain** provides interfaces to write and read blockchains across all shards.
-- **Blockchain** maintains a ledger for one shard. It stores a tree for recording all historical forks, and updates states (available UTXO set) uporn each insertion. Blockchain implements sufficient interfaces for block insertion, fork pruning, and obtaining chain information.
-- **TX-generator** randomly generates transactions and broadcast them to associated nodes via Network. It is not a key component of Manifoldchain system but just for experiment.
+- **Rust**: Latest stable version (install via [rustup.rs](https://rustup.rs/))
+
+## Building the Project
+
+Clone the repository and build the release binary using Cargo:
+
+```bash
+cargo build --release
+```
+
+The executable will be located at `./target/release/Powchain`.
 
 ## Usage
 
-### Simpliest Demo
+OptChain is run via the command-line interface. The binary supports multiple protocols, but this guide focuses on the `optchain` subcommand.
 
-Start a Manifoldchain client:
+### Basic Syntax
 
-```
-cargo run -- -vv --p2p 127.0.0.1:6000 --api 127.0.0.1:7000 --shardId 0 --nodeId 0 --experNumber 0 --shardNum 1 --shardSize 1 --blockSize 2048 --k 6 --domesticRatio 0.7 --eDiff 0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --iDiff 07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-```
-
-parameters:
-
-- `p2p`: the address of peer-to-peer server
-- `api`: the address of API server
-- `shardId`: the ID of shard where the client locats
-- `nodeId`: the ID of this node
-- `experNumber`: the identifier of the experiment, it determines where the log is stored
-- `shardNum`: the total number of the shards
-- `shardSize`: the number of clients within one shard
-- `blockSize`: the number of transactions in one block
-- `k`: the confirmation depth
-- `domesticRatio`: the domestic transaction ratio
-- `eDiff`: the mining difficulty of mining exclusive blocks
-- `iDiff`: the mining difficulty of mining inclusive blocks
-
-### Connecting Clients and Building Network
-
-By using `-c` parameter, a new Manifoldchain client can connect to an old one. To build a fully connecting network of 4 clients, run the following 4 commands as 4 distinct processes:
-
-Process 1:
-
-```
-cargo run -- -vv --p2p 127.0.0.1:6000 --api 127.0.0.1:7000 --shardId 0 --nodeId 0 --experNumber 0 --shardNum 2 --shardSize 2 --blockSize 2048 --k 6 --domesticRatio 0.7 --eDiff 0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --iDiff 07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+```bash
+./target/release/Powchain optchain [FLAGS] [OPTIONS]
 ```
 
-Process 2:
+### Running a Node
 
-```
-cargo run -- -vv --p2p 127.0.0.1:6001 --api 127.0.0.1:7001 -c 127.0.0.1:6000 --shardId 0 --nodeId 1 --experNumber 0 --shardNum 2 --shardSize 2 --blockSize 2048 --k 6 --domesticRatio 0.7 --eDiff 0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --iDiff 07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-```
+Because OptChain is a research prototype, many configuration parameters (such as block sizes, difficulties, and sharding setups) must be explicitly defined via command-line flags. If a required flag is omitted, the client will exit with an error.
 
-Process 3:
+#### Example Command
 
-```
-cargo run -- -vv --p2p 127.0.0.1:6002 --api 127.0.0.1:7002 -c 127.0.0.1:6000 -c 127.0.0.1:6001 --shardId 1 --nodeId 2 --experNumber 0 --shardNum 2 --shardSize 2 --blockSize 2048 --k 6 --domesticRatio 0.7 --eDiff 0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --iDiff 07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-```
+Here is an example of how to start a single node (Shard 0, Node 0) with low difficulty (for testing purposes):
 
-Process 4:
-
-```
-cargo run -- -vv --p2p 127.0.0.1:6003 --api 127.0.0.1:7003 -c 127.0.0.1:6000 -c 127.0.0.1:6001 -c 127.0.0.1:6002 --shardId 1 --nodeId 3 --experNumber 0 --shardNum 2 --shardSize 2 --blockSize 2048 --k 6 --domesticRatio 0.7 --eDiff 0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --iDiff 07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-```
-
-### Experiment
-
-We provide Bash scripts to automatically generate startup commands for Manifoldchain client. We present how to run a demo experiment 0 as an exsample. Under dir `./scripts/expers/exper_0/`, the configuration of experiment 0 is provided:
-
-```
-{
-  "shard_num": 5,
-  "shard_size": 5,
-  "block_size": 2048,
-  "confirmation_depth": 6,
-  "mining_interval": 0,
-  "tx_generation_interval": 25000000,
-  "runtime": 2000,
-  "iteration": 0,
-  "domestic_ratio": 0.7,
-  "inclusive_diff": "0000007fffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "exclusive_diffs": [
-    "0000007fffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-    "000000e7ae147ae147ae147ae147ae147ae147ae147ae147ae147ae147ae1479",
-    "00000188f5c28f5c28f5c28f5c28f5c28f5c28f5c28f5c28f5c28f5c28f5c28c",
-    "0000025851eb851eb851eb851eb851eb851eb851eb851eb851eb851eb851eb80",
-    "000002d999999999999999999999999999999999999999999999999999999993"
-  ],
-  "propagation_delay": 100,
-  "bandwidths": [
-    [5000, 5000, 5000, 5000, 5000],
-    [10000, 10000, 10000, 10000, 10000],
-    [20000, 20000, 20000, 20000, 20000],
-    [40000, 40000, 40000, 40000, 40000],
-    [60000, 60000, 60000, 60000, 60000]
-  ],
-  "description": "test for demo"
-}
+```bash
+./target/release/Powchain optchain \
+  --p2p 127.0.0.1:6000 \
+  --api 127.0.0.1:7000 \
+  --shardId 0 \
+  --nodeId 0 \
+  --shardNum 1 \
+  --shardSize 1 \
+  --experNumber 1 \
+  --experIter 1 \
+  --blockSize 1024 \
+  --symbolSize 32 \
+  --propSize 100 \
+  --avaiSize 100 \
+  --eReq 5 \
+  --iReq 5 \
+  --k 6 \
+  --tDiff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \
+  --pDiff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \
+  --aDiff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \
+  --iDiff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \
+  --oDiff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ```
 
-This .config specifies how the experiment is setup, it includes 5 shards and there are 5 clients(miners) within each shard. The mining difficulties of exclusive blocks and inclusive blocks, as well as the bandwidth for each clients are specified by the `exclusive_diffs`, `inclusive_diff`, and `bandwidths`. `mining_interval` is the waiting inverval between two mining operations. `tx_generation_interval` is the waiting interval between generating two distinct transactions.
+### Configuration Options
 
-Firstly, run `cargo build` to compile the Manifoldchain. By running `cargo test setup -- 0`, the environment for experiment 0 is ready. Under `./scripts/expers/exper_0/` run `sudo ./start.sh` to start the experiment, and it will automatically end after running a certain time specified by `runtime` in the config. If want to stop earlier, run `sudo ./end.sh` under the same dir. 
+Below is a detailed list of all available configuration flags for the `optchain` subcommand.
 
-The location of an experiment is specified by the experiment number and `iteration`. When finishing, the log files are stored in `./log/exper_0/iter_0/{node_id}.txt`, while the running outputs of the program are stored in `./log/exper_0/iter_0/exec_log/{node_id}.txt`.
+#### Network Configuration
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--p2p [ADDR]` | `127.0.0.1:6000` | The IP address and port for the P2P server to listen on. |
+| `--api [ADDR]` | `127.0.0.1:7000` | The IP address and port for the API server (handling RPCs). |
+| `-c, --connect [PEER]` | None | A known peer address to connect to at startup. Can be used multiple times. |
+| `--p2p-workers [INT]` | `1` | Number of worker threads for the P2P server. |
+
+#### Identity & Sharding
+
+| Flag | Required? | Description |
+| --- | --- | --- |
+| `--shardId [INT]` | **Yes** | The shard ID this node belongs to. |
+| `--nodeId [INT]` | **Yes** | A unique identifier for the node within the experiment. |
+| `--shardNum [INT]` | **Yes** | The total number of shards in the network. |
+| `--shardSize [INT]` | **Yes** | The number of nodes per shard. |
+
+#### Block & Data Configuration
+
+| Flag | Required? | Description |
+| --- | --- | --- |
+| `--blockSize [INT]` | **Yes** | The size of the block in bytes. |
+| `--symbolSize [INT]` | **Yes** | The size of a single data symbol in bytes. |
+| `--propSize [INT]` | **Yes** | The size of `prop_tx_set` for each proposer block. |
+| `--avaiSize [INT]` | **Yes** | The size of `avai_tx_set` for each availability block. |
+| `--eReq [INT]` | **Yes** | Number of requested symbols for exclusive transaction blocks. |
+| `--iReq [INT]` | **Yes** | Number of requested symbols for inclusive transaction blocks. |
+| `--k [INT]` | **Yes** | Confirmation depth (security parameter). |
+
+#### Mining Difficulty
+
+Mining difficulties are provided as **32-byte hex strings**. Lower values indicate higher difficulty. For testing, use `ffff...` strings.
+
+| Flag | Description |
+| --- | --- |
+| `--tDiff [HEX]` | Difficulty target for mining a **Transaction Block**. |
+| `--pDiff [HEX]` | Difficulty target for mining a **Proposer Block**. |
+| `--aDiff [HEX]` | Difficulty target for mining an **Exclusive Availability Block**. |
+| `--iDiff [HEX]` | Difficulty target for mining an **Inclusive Availability Block**. |
+| `--oDiff [HEX]` | Difficulty target for mining an **Ordering Block**. |
+
+#### Experiment Logging
+
+| Flag | Description |
+| --- | --- |
+| `-v` | Increases logging verbosity. |
+| `--experNumber [INT]` | Sets the experiment number ID (used for logging/metrics). |
+| `--experIter [INT]` | Sets the iteration number of the experiment. |
+
+## Connecting Multiple Nodes
+
+To run a second node that connects to the first one:
+
+1. Change the ports (`--p2p`, `--api`) to avoid conflicts.
+2. Change the `--nodeId` (and `--shardId` if testing cross-shard).
+3. Use the `--connect` flag to point to the first node.
+
+```bash
+./target/release/Powchain optchain \
+  --p2p 127.0.0.1:6001 \
+  --api 127.0.0.1:7001 \
+  --connect 127.0.0.1:6000 \
+  --shardId 0 \
+  --nodeId 1 \
+  # ... (include all other required size/diff flags same as node 0)
+```
+
+## Quick Start
+
+To quickly spin up a local test environment, we provide a helper script `quick_start.sh`. This script launches **4 nodes** configured as **2 shards with 2 nodes each**.
+
+1. **Make the script executable:**
+```bash
+sudo chmod +x quick_start.sh
+```
+2. **Run the cluster:**
+
+```bash
+./quick_start.sh
+```
