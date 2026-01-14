@@ -27,7 +27,7 @@ OptChain is run via the command-line interface. The binary supports multiple pro
 ### Basic Syntax
 
 ```bash
-./target/release/Powchain optchain [FLAGS] [OPTIONS]
+./target/release/powchain optchain [FLAGS] [OPTIONS]
 ```
 
 ### Running a Node
@@ -39,7 +39,7 @@ Because OptChain is a research prototype, many configuration parameters (such as
 Here is an example of how to start a single node (Shard 0, Node 0) with low difficulty (for testing purposes):
 
 ```bash
-./target/release/Powchain optchain \
+./target/release/powchain optchain \
   --p2p 127.0.0.1:6000 \
   --api 127.0.0.1:7000 \
   --shardId 0 \
@@ -125,7 +125,7 @@ To run a second node that connects to the first one:
 3. Use the `--connect` flag to point to the first node.
 
 ```bash
-./target/release/Powchain optchain \
+./target/release/powchain optchain \
   --p2p 127.0.0.1:6001 \
   --api 127.0.0.1:7001 \
   --connect 127.0.0.1:6000 \
