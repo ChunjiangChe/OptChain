@@ -92,8 +92,8 @@ Below is a detailed list of all available configuration flags for the `optchain`
 | `--symbolSize [INT]` | **Yes** | The size of a single data symbol in bytes. |
 | `--propSize [INT]` | **Yes** | The size of `prop_tx_set` for each proposer block. |
 | `--avaiSize [INT]` | **Yes** | The size of `avai_tx_set` for each availability block. |
-| `--eReq [INT]` | **Yes** | Number of requested symbols for exclusive transaction blocks. |
-| `--iReq [INT]` | **Yes** | Number of requested symbols for inclusive transaction blocks. |
+| `--eReq [INT]` | **Yes** | Number of requested symbols for local transaction blocks. |
+| `--iReq [INT]` | **Yes** | Number of requested symbols for global transaction blocks. |
 | `--k [INT]` | **Yes** | Confirmation depth (security parameter). |
 
 #### Mining Difficulty
@@ -104,8 +104,8 @@ Mining difficulties are provided as **32-byte hex strings**. Lower values indica
 | --- | --- |
 | `--tDiff [HEX]` | Difficulty target for mining a **Transaction Block**. |
 | `--pDiff [HEX]` | Difficulty target for mining a **Proposer Block**. |
-| `--aDiff [HEX]` | Difficulty target for mining an **Exclusive Availability Block**. |
-| `--iDiff [HEX]` | Difficulty target for mining an **Inclusive Availability Block**. |
+| `--aDiff [HEX]` | Difficulty target for mining an **Local Availability Block**. |
+| `--iDiff [HEX]` | Difficulty target for mining an **Global Availability Block**. |
 | `--oDiff [HEX]` | Difficulty target for mining an **Ordering Block**. |
 
 #### Experiment Logging
