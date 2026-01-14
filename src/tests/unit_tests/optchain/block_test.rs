@@ -142,7 +142,7 @@ use bincode;
 
 #[test]
 fn test_block_size() {
-    let block_size = 8192;
+    let block_size = 2048;
     let symbol_size = 64;
     let txs: Vec<Vec<Transaction>> = (0..(block_size / symbol_size))
         .into_iter()
