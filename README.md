@@ -18,7 +18,7 @@ Clone the repository and build the release binary using Cargo:
 cargo build --release
 ```
 
-The executable will be located at `./target/release/Powchain`.
+The executable will be located at `./target/release/powchain`.
 
 ## Usage
 
